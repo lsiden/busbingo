@@ -1,0 +1,10 @@
+dm-core --version '~>1.0'
+do_postgres
+dm-postgres-adapter
+dm-core
+dm-timestamps
+dm-migrations
+dm-is-list
+json --version '~>1.0'
+sinatra --version '~>1.0'
+thin
