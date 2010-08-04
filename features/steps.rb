@@ -1,3 +1,4 @@
+require File.dirname(__FILE__) + '/../lib/bingoCard.rb'
 require 'pp'
 
 Given /^the following board$/ do |table|
@@ -5,25 +6,17 @@ Given /^the following board$/ do |table|
   @data = table.raw
 end
 
-@zero
-Then /^I count 0 covered squares$/ do
-  count = @data.flatten.inject(0) {|sum, token| sum + (token == 'x' ? 1 : 0)}
-  count.should == 0
+Then /^I count (\d+) covered squares$/ do |count|
+  (@data.flatten.inject(0) {|sum, token| sum + (token == 'x' ? 1 : 0)} ).should == count.to_i
 end
 
 Then /^I do not have bingo$/ do
-  pending # express the regexp above with the code you wish you had
-end
-
-Then /^I count 12 covered squares$/ do
-  pending # express the regexp above with the code you wish you had
-end
-
-Then /^I count 14 covered squares$/ do
-  pending # express the regexp above with the code you wish you had
+  card = BingoCard.new(@data)
+  card.bingo?.should_not be_true
 end
 
 Then /^I do have bingo$/ do
-  pending # express the regexp above with the code you wish you had
+  card = BingoCard.new(@data)
+  card.bingo?.should be_true
 end
 
