@@ -20,3 +20,7 @@ Then /^I do have bingo$/ do
   card.bingo?.should be_true
 end
 
+When /^the last tile covered was \((\d), (\d)\)$/ do |row, col|
+  @row = row
+  @col = col
+end
