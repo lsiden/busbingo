@@ -5,6 +5,7 @@ require 'dm-core'
 require 'dm-timestamps'
 require 'dm-migrations'
 require 'dm-is-list'
+require 'dm-timestamps'
 #require 'dm-types'
 #require 'dm-validations'
 #require 'json'
@@ -12,7 +13,7 @@ require 'dm-is-list'
 #require 'pp'
 #require 'digest/sha1'
 
-DataMapper.setup(:default, ENV['DATABASE_URL'] || 'sqlite3:/tmp/busbingo.db')
+DataMapper.setup(:default, ENV['DATABASE_URL'] || 'sqlite3:busbingo.db')
 
 DataMapper::Model.raise_on_save_failure = true
 
@@ -36,9 +37,7 @@ module BusBingo
 		property	:id, Serial
 		property	:title, String
 		property	:alt, String
-		property	:image_unselected, String	# name of image file without pathname
-		property	:image_hover, String			# name of image file without pathname when hovering
-		property	:image_selected, String		# name of image file without pathname when selected
+		property	:image_filename, String		# name of image file without pathname
 		property	:enabled?, Boolean				# whether to include this image in new cards
     has n,    :tiles
 	end
@@ -47,6 +46,7 @@ module BusBingo
 		include DataMapper::Resource
 		property	:id, Serial
 		property	:covered?, Boolean				# whether this tile on the card is covered
+		property	:updated_at, DateTime
 
     belongs_to  :tile_template
     belongs_to  :bingo_card
@@ -56,6 +56,7 @@ module BusBingo
   class BingoCard
 		include DataMapper::Resource
     property    :id, Serial
+		property		:created_at, DateTimeproperty :updated_at, DateTime
     belongs_to  :player
     has n,      :tiles  # always 25 for a 5 x 5 card
   end
@@ -70,5 +71,5 @@ end
 DataMapper.finalize
 
 # TODO
-#DataMapper.auto_upgrade! # for production
-DataMapper.auto_migrate!  # for testing - will destroy any existing data!
+DataMapper.auto_upgrade! # for production
+#DataMapper.auto_migrate!  # for testing - will destroy any existing data!
