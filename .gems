@@ -1,7 +1,6 @@
 dm-core --version '~>1.0'
 do_postgres
 dm-postgres-adapter
-dm-sqlite-adapter
 dm-core
 dm-timestamps
 dm-migrations

@@ -56,7 +56,8 @@ module BusBingo
   class BingoCard
 		include DataMapper::Resource
     property    :id, Serial
-		property		:created_at, DateTimeproperty :updated_at, DateTime
+		property		:created_at, DateTime
+		property 		:updated_at, DateTime
     belongs_to  :player
     has n,      :tiles  # always 25 for a 5 x 5 card
   end
