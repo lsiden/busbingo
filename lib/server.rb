@@ -80,6 +80,10 @@ class Sinatra::Application
 
   # Render page with game card.
   # TODO - Replace this with '/game' or '/', id is in session
+  get '/count-tiles' do
+		BusBingo::TileTemplate.count
+	end
+
   get '/mockup' do
     #FileUtils.pwd
     send_file('views/mock.html')
