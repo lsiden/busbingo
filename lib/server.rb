@@ -12,6 +12,20 @@ require 'model'
 
 class Sinatra::Application
 
+  helpers do
+
+    def set_long_expiration_header
+      # set long expiration headers  
+      one_year = 360 * 24 * 60 * 60 # a little less than a year for proxy's-sake
+      time = Time.now + one_year
+      time = time.to_time if time.respond_to?(:to_time)
+      time = time.httpdate if time.respond_to?(:httpdate)
+
+      response['Expires'] = time
+      response['Cache-Control'] = "public, max-age=#{one_year}"
+    end
+  end
+
   # some configuration
   enable :dump_errors, :logging
 
@@ -79,7 +93,7 @@ class Sinatra::Application
   # Mock page
 
   # Render page with game card.
-  # TODO - Replace this with '/game' or '/', id is in session
+  # TODO - Replace this with '/card' or '/', id is in session
   get '/count-tiles' do
 		BusBingo::TileTemplate.count.to_s
 	end
@@ -92,31 +106,42 @@ class Sinatra::Application
   ###############
   # Games
 
-  # Create a new game.
-  post '/games' do
-    'Work in progress'
+  # Create a new card.
+  post '/cards' do
+		card = BusBingo::Card.new
+		#availableTiles = BusBingo::TileTemplate.all(:enabled => true) # does not work with SqlLite
+		availableTiles = BusBingo::TileTemplate.all
+		card.tiles = (0..24).map {BusBingo::Tile.new(:tile_template => availableTiles[rand(availableTiles.length-1)])}
+		card.player = BusBingo::Player.new # TODO - Player should be available from session
+		card.save
+		redirect "http://#{request.host}/cards/#{card.id}"
   end
 
-  # Render page with game card.
-  # TODO - Replace this with '/game' or '/', id is in session
-  get '/games/:id' do
+  # Render page with card card.
+  # TODO - Replace this with '/card' or '/', id is in session
+  get '/cards/:id' do
     'Work in progress'
   end
 
   # TODO - Requires admin session.
-  # Render list of games and their outcomes.
-  get '/games' do
+  # Render list of cards and their outcomes.
+  get '/cards' do
     'Work in progress'
   end
 
-  # For game :id, set <row, col> to state {0 = uncovered, anything else is covered}.
-  # Returns header with x-busbingo-gamestate that matches /'[x ]{25}'(, winner)?/
-  put 'game/:id/:row/:col/:state' do
+  # For card :id, set <row, col> to state {0 = uncovered, anything else is covered}.
+  # Returns header with x-busbingo-cardstate that matches /'[x ]{25}'(, winner)?/
+  put 'card/:id/:row/:col/:state' do
     'Work in progress'
   end
 
   #################
   # Static Content
+
+  get '/favicon.ico' do
+    set_long_expiration_header
+    send_file('views/images/favicon.ico');
+  end
 
   get '/views/*' do
     # Get file path.  if refers to a directory, try index.html
@@ -125,18 +150,10 @@ class Sinatra::Application
     path = File.join(path, 'index.html') if File.directory?(path)
     #logger.debug(path)
 
-    # set long expiration headers  
-    one_year = 360 * 24 * 60 * 60 # a little less than a year for proxy's-sake
-    time = Time.now + one_year
-    time = time.to_time if time.respond_to?(:to_time)
-    time = time.httpdate if time.respond_to?(:httpdate)
-
-    response['Expires'] = time
-    response['Cache-Control'] = "public, max-age=#{one_year}"
+    set_long_expiration_header
 
     # send actual file
     #Rack::Mime.mime_type('text/plain', nil); # throws exception ?
     send_file(path)
-  end
-
+	end
 end

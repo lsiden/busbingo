@@ -5,6 +5,7 @@ dm-core
 dm-timestamps
 dm-migrations
 dm-is-list
+dm-validations
 json --version '~>1.0'
 sinatra --version '~>1.0'
 thin

@@ -7,7 +7,7 @@ require 'dm-migrations'
 require 'dm-is-list'
 require 'dm-timestamps'
 #require 'dm-types'
-#require 'dm-validations'
+require 'dm-validations'
 #require 'json'
 #require 'set'
 #require 'pp'
@@ -39,6 +39,7 @@ module BusBingo
 		property	:alt, String
 		property	:image_filename, String		# name of image file without pathname
 		property	:enabled?, Boolean				# whether to include this image in new cards
+
     has n,    :tiles
 	end
 
@@ -49,15 +50,15 @@ module BusBingo
 		property	:updated_at, DateTime
 
     belongs_to  :tile_template
-    belongs_to  :bingo_card
-    is :list, :scope => :bingo_card_id
+    belongs_to  :card
+    is :list, :scope => :card_id
 	end
 
-  class BingoCard
+  class Card
 		include DataMapper::Resource
     property    :id, Serial
 		property		:created_at, DateTime
-		property 		:updated_at, DateTime
+
     belongs_to  :player
     has n,      :tiles  # always 25 for a 5 x 5 card
   end
