@@ -120,7 +120,10 @@ class Sinatra::Application
   # Render page with card card.
   # TODO - Replace this with '/card' or '/', id is in session
   get '/cards/:id' do
-    'Work in progress'
+    puts "id=#{params[:id]}"
+    card = BusBingo::Card.get(params[:id]) \
+      or halt 404, 'Not Found'
+    pp card
   end
 
   # TODO - Requires admin session.
