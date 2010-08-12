@@ -12,12 +12,22 @@
       <link rel="stylesheet" href="/views/style.css" type="text/css" media="all" />
     </head>
     <body>
+      <h1>Transit Bingo</h1>
+      <div id="bingo-card">
 
 - i = 0
 - (0..4).each do |row|
   - (0..4).each do |col|
-    %img{:src => "/views/images/#{@card.tiles[i].tile_template.image_filename}"}
+    - tt = @card.tiles[i].tile_template
+    %div{:class => [%w(cell picture), "row#{row}", "col#{col}"]}
+      %a{:href => "#"}
+        %img{:src => "/views/images/#{tt.image_filename}", :title => tt.title, :alt => tt.alt }
+    %div{:class => [%w(cell checkmark), "row#{row}", "col#{col}"]}
+      %a{:href => "#"}
+        %img{:src => "/views/images/checkmark.png", :title => tt.title, :alt => tt.alt }
     - i += 1
+
 :plain
+      </div>
     </body>
   </html>
