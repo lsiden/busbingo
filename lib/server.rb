@@ -8,6 +8,7 @@ require 'rest_client'
 require 'logger'
 require 'pp'
 require 'model'
+require 'permutation'
 #require 'fileutils'
 
 class Sinatra::Application
@@ -109,9 +110,14 @@ class Sinatra::Application
   # Create a new card.
   post '/cards' do
 		card = BusBingo::Card.new
-		#availableTiles = BusBingo::TileTemplate.all(:enabled => true) # does not work with SqlLite
-		availableTiles = BusBingo::TileTemplate.all
-		card.tiles = (0..24).map {BusBingo::Tile.new(:tile_template => availableTiles[rand(availableTiles.length-1)])}
+		#tileTemplates = BusBingo::TileTemplate.all(:enabled => true) # does not work with SqlLite
+		tileTemplates = BusBingo::TileTemplate.all
+    while tileTemplates.length < 25 do
+      tileTemplates << tileTemplates.clone
+    end
+    perm = Permutation.for(tileTemplates)
+		perm.random.project
+		card.tiles << tileTemplates[0, 24].map{|tt| BusBingo::Tile.new(:tile_template => tt)}
 		card.player = BusBingo::Player.new # TODO - Player should be available from session
 		card.save
 		redirect "http://#{request.host}/cards/#{card.id}"
