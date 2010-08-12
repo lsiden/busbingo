@@ -1,0 +1,23 @@
+!!! Strict
+/ Copyright 2010, Westside Consulting LLC, Ann Arbor, MI, USA
+
+:plain
+  <html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+      <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
+      <meta http-equiv="content-script-type" content="text/javascript" />
+      <title>Bus Bingo</title>
+      <script type="text/javascript" src="/views/jquery-1.4.2.min.js"></script>
+      <script type="text/javascript" src="/views/script.js"></script>
+      <link rel="stylesheet" href="/views/style.css" type="text/css" media="all" />
+    </head>
+    <body>
+
+- i = 0
+- (0..4).each do |row|
+  - (0..4).each do |col|
+    %img{:src => "/views/images/#{@card.tiles[i].tile_template.image_filename}"}
+    - i += 1
+:plain
+    </body>
+  </html>

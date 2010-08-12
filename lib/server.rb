@@ -121,9 +121,10 @@ class Sinatra::Application
   # TODO - Replace this with '/card' or '/', id is in session
   get '/cards/:id' do
     puts "id=#{params[:id]}"
-    card = BusBingo::Card.get(params[:id]) \
+    @card = BusBingo::Card.get(params[:id]) \
       or halt 404, 'Not Found'
-    pp card
+    pp @card
+    haml :card
   end
 
   # TODO - Requires admin session.
@@ -149,7 +150,7 @@ class Sinatra::Application
   get '/views/*' do
     # Get file path.  if refers to a directory, try index.html
     path = params[:splat].first.split('/')
-    path = File.join('views', *path)
+    path = File.join('lib/views', *path)
     path = File.join(path, 'index.html') if File.directory?(path)
     #logger.debug(path)
 
@@ -159,4 +160,11 @@ class Sinatra::Application
     #Rack::Mime.mime_type('text/plain', nil); # throws exception ?
     send_file(path)
 	end
+
+  # Test that haml works
+=begin
+  get '/hello' do
+    haml :hello
+  end
+=end
 end
