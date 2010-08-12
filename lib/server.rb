@@ -111,13 +111,12 @@ class Sinatra::Application
   post '/cards' do
 		card = BusBingo::Card.new
 		#tileTemplates = BusBingo::TileTemplate.all(:enabled => true) # does not work with SqlLite
-		tileTemplates = BusBingo::TileTemplate.all
+		tileTemplates = []
     while tileTemplates.length < 25 do
-      tileTemplates << tileTemplates.clone
+      tileTemplates += BusBingo::TileTemplate.all.to_a
     end
-    perm = Permutation.for(tileTemplates)
-		perm.random.project
-		card.tiles << tileTemplates[0, 24].map{|tt| BusBingo::Tile.new(:tile_template => tt)}
+		card.tiles = Permutation.for(tileTemplates).random!.project(tileTemplates)[0, 25] \
+      .map {|tt| BusBingo::Tile.new(:tile_template => tt)}
 		card.player = BusBingo::Player.new # TODO - Player should be available from session
 		card.save
 		redirect "http://#{request.host}/cards/#{card.id}"

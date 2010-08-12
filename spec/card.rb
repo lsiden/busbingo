@@ -11,11 +11,9 @@ describe BusBingo::Card do
     while tileTemplates.length < 25 do
       tileTemplates += BusBingo::TileTemplate.all.to_a
     end
-    perm = Permutation.new(tileTemplates.length)
-		card.tiles = perm.random!.value[0, 25].map{|i| BusBingo::Tile.new(:tile_template => tileTemplates[i])}
+		card.tiles = Permutation.for(tileTemplates).random!.project(tileTemplates)[0, 25] \
+      .map {|tt| BusBingo::Tile.new(:tile_template => tt)}
 		card.player = BusBingo::Player.new # TODO - Player should be available from session
-		card.save
-
+		lambda{card.save}.should_not raise_error
   end
-
 end
