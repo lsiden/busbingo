@@ -141,14 +141,17 @@ class Sinatra::Application
   # For card :id, set <row, col> to state {0 = uncovered, anything else is covered}.
   # Returns header with x-busbingo-has-bingo that matches /'[x ]{nTiles}'(, winner)?/
   put '/cards/:id' do
-    @card = BusBingo::Card.get(params[:id]) \
+    card = BusBingo::Card.get(params[:id]) \
       or halt 404, 'Not Found'
     #puts(params)
-    tile = @card.tileAt(params[:row], params[:col])
+    tile = card.tileAt(params[:row], params[:col])
     tile.covered = (params[:covered] === "true")
     tile.save
     # TODO - Set header x-busbingo-has-bingo
-    (0..BusBingo::Card::N_ROWS-1).each
+    data = (0..BusBingo::Card::N_ROWS-1).map do |i|
+      card.rowAt(i).map {|tile| tile.covered? ? 'x' : ' '}
+    end
+    pp data
     status 200
   end
 

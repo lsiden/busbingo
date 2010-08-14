@@ -68,6 +68,11 @@ module BusBingo
     def tileAt(row, col)
       self.tiles[row.to_i * N_COLS + col.to_i]
     end
+
+    # Return an entire row as an array
+    def rowAt(row)
+      self.tiles[row.to_i * N_COLS, N_COLS]
+    end
   end
 
 	class Player
