@@ -1,12 +1,22 @@
 module BingoLogic
 
-  class BingoCell < String
+  class BingoCell
+
+    def initialize(covered)
+      if covered.kind_of?(String) then
+        @covered = (covered == 'x')
+      else
+        @covered = covered ? true : false
+      end
+    end
+
     def covered?
-      return self == 'x'
+      return @covered
     end
   end
 
   class BingoCard
+
     # rawdata is in the form [[row0], ..., [row-n]].
     # row-n is in the form [BingoCell-0, ..., BingoCell-m].
     def initialize(rawdata)
