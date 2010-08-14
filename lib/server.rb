@@ -34,9 +34,23 @@ class Sinatra::Application
       response['Cache-Control'] = "public, max-age=#{one_year}"
     end
 
-  # some configuration
-  enable :dump_errors, :logging
-  disable :show_exceptions
+    def login
+      json = RestClient.post('https://rpxnow.com/api/v2/auth_info',
+                             :token => params[:token],
+                             :apiKey => '8aa5b41a23857ec2bfa56f4cb3d9aedf15ae0148',
+                             :format => 'json', :extended => 'true')
+      auth_response = JSON.parse(json)
+      logger.debug "auth_response=#{auth_response.pretty_inspect}"
+
+      if auth_response['stat'] == 'ok' then
+        create_session_for(auth_response['profile']['identifier'])
+      elsif err = auth_response['err'] then
+        logger.info "Login failed; RPX auth_response #{err['code']}: #{err['msg']}"
+      else
+        logger.warn "Login failed; #{auth_response.pretty_inspect}"
+      end
+      redirect '/'
+    end
 
     def logger
       if (@_logger.nil?) then
