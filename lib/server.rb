@@ -10,6 +10,7 @@ require 'pp'
 require 'model'
 require 'permutation'
 require 'haml'
+require 'bingoLogic'
 #require 'fileutils'
 
 class Sinatra::Application
@@ -22,7 +23,10 @@ class Sinatra::Application
       time = Time.now + one_year
       time = time.to_time if time.respond_to?(:to_time)
       time = time.httpdate if time.respond_to?(:httpdate)
-
+=begin
+      headers 'Expires' => time, \
+              'Cache-Control' => "public, max-age=#{one_year}"
+=end
       response['Expires'] = time
       response['Cache-Control'] = "public, max-age=#{one_year}"
     end
@@ -98,8 +102,8 @@ class Sinatra::Application
   # Render page with game card.
   # TODO - Replace this with '/card' or '/', id is in session
   get '/count-tiles' do
-		BusBingo::TileTemplate.count.to_s
-	end
+    BusBingo::TileTemplate.count.to_s
+  end
 
   get '/mockup' do
     #FileUtils.pwd
@@ -111,18 +115,18 @@ class Sinatra::Application
 
   # Create a new card.
   post '/cards' do
-		card = BusBingo::Card.new
-		#tileTemplates = BusBingo::TileTemplate.all(:enabled => true) # does not work with SqlLite
-		tileTemplates = []
+    card = BusBingo::Card.new
+    #tileTemplates = BusBingo::TileTemplate.all(:enabled => true) # does not work with SqlLite
+    tileTemplates = []
     nTiles = BusBingo::Card::N_ROWS * BusBingo::Card::N_COLS
     while tileTemplates.length < nTiles do
       tileTemplates += BusBingo::TileTemplate.all
     end
-		card.tiles = Permutation.for(tileTemplates).random!.project(tileTemplates)[0, nTiles] \
+    card.tiles = Permutation.for(tileTemplates).random!.project(tileTemplates)[0, nTiles] \
       .map {|tt| BusBingo::Tile.new(:tile_template => tt)}
-		card.player = BusBingo::Player.new # TODO - Player should be available from session
-		card.save
-		redirect "http://#{request.host}:#{request.port}/cards/#{card.id}"
+    card.player = BusBingo::Player.new # TODO - Player should be available from session
+    card.save
+    redirect "http://#{request.host}:#{request.port}/cards/#{card.id}"
   end
 
   # Render page with card card.
@@ -148,11 +152,13 @@ class Sinatra::Application
     tile = card.tileAt(params[:row], params[:col])
     tile.covered = (params[:covered] === "true")
     tile.save
-    # TODO - Set header x-busbingo-has-bingo
+
     data = (0..BusBingo::Card::N_ROWS-1).map do |i|
       card.rowAt(i).map {|tile| tile.covered? ? 'x' : ' '}
     end
-    pp data
+    #pp data
+    bingoLogic = BingoLogic::BingoCard.new(data)
+    headers 'x-busbingo-has-bingo' => bingoLogic.bingo? ? "true" : "false"
     status 200
   end
 
@@ -175,7 +181,7 @@ class Sinatra::Application
     #Rack::Mime.mime_type('text/plain', nil); # throws exception ?
     set_long_expiration_header
     send_file(path)
-	end
+  end
 
   # Test that haml works
 =begin

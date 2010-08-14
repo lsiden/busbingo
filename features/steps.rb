@@ -1,6 +1,3 @@
-require File.dirname(__FILE__) + '/../lib/bingoCard.rb'
-require 'pp'
-
 Given /^the following board$/ do |table|
   # table is a Cucumber::Ast::Table
   @data = table.raw
@@ -11,12 +8,12 @@ Then /^I count (\d+) covered squares$/ do |count|
 end
 
 Then /^I do not have bingo$/ do
-  card = BingoCard.new(@data)
+  card = BingoLogic::BingoCard.new(@data)
   card.bingo?.should_not be_true
 end
 
 Then /^I do have bingo$/ do
-  card = BingoCard.new(@data)
+  card = BingoLogic::BingoCard.new(@data)
   card.bingo?.should be_true
 end
 
