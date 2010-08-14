@@ -6,8 +6,8 @@ require 'dm-timestamps'
 require 'dm-migrations'
 require 'dm-is-list'
 require 'dm-timestamps'
-#require 'dm-types'
 require 'dm-validations'
+#require 'dm-types'
 #require 'json'
 #require 'set'
 #require 'pp'
@@ -61,6 +61,13 @@ module BusBingo
 
     belongs_to  :player
     has n,      :tiles  # always 25 for a 5 x 5 card
+
+    N_ROWS = 5
+    N_COLS = 5
+
+    def tileAt(row, col)
+      self.tiles[row.to_i * N_COLS + col.to_i]
+    end
   end
 
 	class Player

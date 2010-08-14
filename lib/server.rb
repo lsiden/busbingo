@@ -29,6 +29,7 @@ class Sinatra::Application
 
   # some configuration
   enable :dump_errors, :logging
+  disable :show_exceptions
 
   helpers do
     def logger
@@ -112,23 +113,22 @@ class Sinatra::Application
 		card = BusBingo::Card.new
 		#tileTemplates = BusBingo::TileTemplate.all(:enabled => true) # does not work with SqlLite
 		tileTemplates = []
-    while tileTemplates.length < 25 do
-      tileTemplates += BusBingo::TileTemplate.all.to_a
+    nTiles = BusBingo::Card::N_ROWS * BusBingo::Card::N_COLS
+    while tileTemplates.length < nTiles do
+      tileTemplates += BusBingo::TileTemplate.all
     end
-		card.tiles = Permutation.for(tileTemplates).random!.project(tileTemplates)[0, 25] \
+		card.tiles = Permutation.for(tileTemplates).random!.project(tileTemplates)[0, nTiles] \
       .map {|tt| BusBingo::Tile.new(:tile_template => tt)}
 		card.player = BusBingo::Player.new # TODO - Player should be available from session
 		card.save
-		redirect "http://#{request.host}/cards/#{card.id}"
+		redirect "http://#{request.host}:#{request.port}/cards/#{card.id}"
   end
 
   # Render page with card card.
   # TODO - Replace this with '/card' or '/', id is in session
   get '/cards/:id' do
-    puts "id=#{params[:id]}"
     @card = BusBingo::Card.get(params[:id]) \
       or halt 404, 'Not Found'
-    pp @card
     haml :card
   end
 
@@ -139,9 +139,17 @@ class Sinatra::Application
   end
 
   # For card :id, set <row, col> to state {0 = uncovered, anything else is covered}.
-  # Returns header with x-busbingo-cardstate that matches /'[x ]{25}'(, winner)?/
-  put 'card/:id/:row/:col/:state' do
-    'Work in progress'
+  # Returns header with x-busbingo-has-bingo that matches /'[x ]{nTiles}'(, winner)?/
+  put '/cards/:id' do
+    @card = BusBingo::Card.get(params[:id]) \
+      or halt 404, 'Not Found'
+    #puts(params)
+    tile = @card.tileAt(params[:row], params[:col])
+    tile.covered = (params[:covered] === "true")
+    tile.save
+    # TODO - Set header x-busbingo-has-bingo
+    (0..BusBingo::Card::N_ROWS-1).each
+    status 200
   end
 
   #################

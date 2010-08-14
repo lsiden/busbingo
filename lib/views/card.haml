@@ -18,11 +18,13 @@
 - i = 0
 - (0..4).each do |row|
   - (0..4).each do |col|
-    - tt = @card.tiles[i].tile_template
+    - tile = @card.tiles[i]
+    - tt = tile.tile_template
+    - checkmark_on = tile.covered? ? "on" : ""
     %div{:class => [%w(cell picture), "row#{row}", "col#{col}"]}
       %a{:href => "#"}
         %img{:src => "/views/images/#{tt.image_filename}", :title => tt.title, :alt => tt.alt }
-    %div{:class => [%w(cell checkmark), "row#{row}", "col#{col}"]}
+    %div{:class => [%w(cell checkmark), "row#{row}", "col#{col}", checkmark_on]}
       %a{:href => "#"}
         %img{:src => "/views/images/checkmark.png", :title => tt.title, :alt => tt.alt }
     - i += 1

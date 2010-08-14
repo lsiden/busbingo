@@ -35,8 +35,12 @@ div.cell.picture:hover {
   background-color: red;
 }
 
-.checkmark {
+div.checkmark {
   display: none;
+}
+
+div.checkmark.on {
+  display: block;
 }
 
 .checkmark img {
