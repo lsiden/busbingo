@@ -9,6 +9,7 @@ require 'logger'
 require 'pp'
 require 'model'
 require 'permutation'
+require 'haml'
 #require 'fileutils'
 
 class Sinatra::Application
@@ -170,10 +171,9 @@ class Sinatra::Application
     path = File.join(path, 'index.html') if File.directory?(path)
     #logger.debug(path)
 
-    set_long_expiration_header
-
     # send actual file
     #Rack::Mime.mime_type('text/plain', nil); # throws exception ?
+    set_long_expiration_header
     send_file(path)
 	end
 
