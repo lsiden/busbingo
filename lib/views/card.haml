@@ -1,8 +1,9 @@
 !!! Strict
 / Copyright 2010, Westside Consulting LLC, Ann Arbor, MI, USA
 
-:plain
-  <html xmlns="http://www.w3.org/1999/xhtml">
+%html(xmlns = "http://www.w3.org/1999/xhtml")
+
+  :plain
     <head>
       <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
       <meta http-equiv="content-script-type" content="text/javascript" />
@@ -11,25 +12,24 @@
       <script type="text/javascript" src="/views/script.js"></script>
       <link rel="stylesheet" href="/views/style.css" type="text/css" media="all" />
     </head>
-    <body>
-      <h1>Transit Bingo</h1>
-      <div id="bingo-card">
 
-- i = 0
-- (0..4).each do |row|
-  - (0..4).each do |col|
-    - tile = @card.tiles[i]
-    - tt = tile.tile_template
-    - checkmark_on = tile.covered? ? "on" : ""
-    %div{:class => [%w(cell picture), "row#{row}", "col#{col}"]}
-      %a{:href => "#"}
-        %img{:src => "/views/images/#{tt.image_filename}", :title => tt.title, :alt => tt.alt }
-    %div{:class => [%w(cell checkmark), "row#{row}", "col#{col}", checkmark_on]}
-      %a{:href => "#"}
-        %img{:src => "/views/images/checkmark.png", :title => tt.title, :alt => tt.alt }
-    - i += 1
+  %body
+    -# = pp @card
+    %h1
+      Bus Bingo 
+      %span#you-have-bingo{:class => @card.has_bingo? && "on"}
+        %span#you-have-bingo-inside - You have Bingo!
 
-:plain
-      </div>
-    </body>
-  </html>
+    %div#bingo-card
+      - i = 0
+      - (0..4).each do |row|
+        - (0..4).each do |col|
+          - tile = @card.tiles[i]
+          - tt = tile.tile_template
+          %div{:class => [%w(cell picture), "row#{row}", "col#{col}"]}
+            %a{:href => "#"}
+              %img{:src => "/views/images/#{tt.image_filename}", :title => tt.title, :alt => tt.alt }
+          %div{:class => [%w(cell checkmark), "row#{row}", "col#{col}", tile.covered? && "on"]}
+            %a{:href => "#"}
+              %img{:src => "/views/images/checkmark.png", :title => tt.title, :alt => tt.alt }
+          - i += 1

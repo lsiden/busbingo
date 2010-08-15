@@ -10,7 +10,6 @@ require 'pp'
 require 'model'
 require 'permutation'
 require 'haml'
-require 'bingoLogic'
 #require 'fileutils'
 
 class Sinatra::Application
@@ -136,8 +135,6 @@ class Sinatra::Application
   get '/cards/:id' do
     @card = BusBingo::Card.get(params[:id]) \
       or halt 404, 'Not Found'
-    bingoLogic = BingoLogic::BingoCard.new(@card.rawdata)
-    headers 'x-busbingo-has-bingo' => bingoLogic.bingo? ? "true" : "false"
     haml :card
   end
 
@@ -153,12 +150,11 @@ class Sinatra::Application
     card = BusBingo::Card.get(params[:id]) \
       or halt 404, 'Not Found'
     #puts(params)
-    tile = card.tileAt(params[:row], params[:col])
+    row, col = params[:row].to_i, params[:col].to_i
+    tile = card.tileAt(row, col)
     tile.covered = (params[:covered] === "true")
     tile.save
-
-    bingoLogic = BingoLogic::BingoCard.new(card.rawdata)
-    headers 'x-busbingo-has-bingo' => bingoLogic.bingo? ? "true" : "false"
+    headers 'x-busbingo-has-bingo' => card.has_bingo?(row, col) ? "true" : "false"
     status 200
   end
 

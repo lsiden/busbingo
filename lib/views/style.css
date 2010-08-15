@@ -47,6 +47,15 @@ div.checkmark.on {
   opacity: .85;
 }
 
+#you-have-bingo {
+  display: none;
+}
+
+#you-have-bingo.on {
+  display: inline;
+  color: green;
+}
+
 /*
 a:active {
 background-color: #CCC;

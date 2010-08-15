@@ -27,7 +27,7 @@ module BingoLogic
     # Returns true iff the card has a completely covered row, column, or diagonal.
     # If row and col are non-nil, checks only that row and column, and diagonal 
     # if row, col lies on either diagonal.
-    def bingo?(row=nil, col=nil)
+    def has_bingo?(row=nil, col=nil)
       if (row) then
         return true if self.covered_row?(row)
       else

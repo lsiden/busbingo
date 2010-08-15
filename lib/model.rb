@@ -7,6 +7,7 @@ require 'dm-migrations'
 require 'dm-is-list'
 require 'dm-timestamps'
 require 'dm-validations'
+require 'bingoLogic'
 #require 'dm-types'
 #require 'json'
 #require 'set'
@@ -69,13 +70,17 @@ module BusBingo
       self.tiles[row.to_i * N_COLS + col.to_i]
     end
 
+    def has_bingo?(row=nil, col=nil)
+      BingoLogic::BingoCard.new(self.rawdata).has_bingo?(row, col)
+    end
+
+    protected
+
     def rawdata
       (0..BusBingo::Card::N_ROWS-1).map do |i|
         self.rowAt(i).map {|tile| tile.covered?}
       end
     end
-
-    protected
 
     # Return an entire row as an array
     def rowAt(row)

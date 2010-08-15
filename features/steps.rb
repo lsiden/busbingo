@@ -9,12 +9,12 @@ end
 
 Then /^I do not have bingo$/ do
   card = BingoLogic::BingoCard.new(@data)
-  card.bingo?.should_not be_true
+  card.has_bingo?.should_not be_true
 end
 
 Then /^I do have bingo$/ do
   card = BingoLogic::BingoCard.new(@data)
-  card.bingo?.should be_true
+  card.has_bingo?.should be_true
 end
 
 When /^the last tile covered was \((\d), (\d)\)$/ do |row, col|
