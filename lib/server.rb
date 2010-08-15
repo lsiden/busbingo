@@ -26,10 +26,6 @@ class Sinatra::Application
       time = Time.now + one_year
       time = time.to_time if time.respond_to?(:to_time)
       time = time.httpdate if time.respond_to?(:httpdate)
-=begin
-      headers 'Expires' => time, \
-              'Cache-Control' => "public, max-age=#{one_year}"
-=end
       response['Expires'] = time
       response['Cache-Control'] = "public, max-age=#{one_year}"
     end
