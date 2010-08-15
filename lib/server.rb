@@ -10,12 +10,14 @@ require 'pp'
 require 'model'
 require 'permutation'
 require 'haml'
+require 'rest_client'
 #require 'fileutils'
 
 class Sinatra::Application
 
   # some configuration
-  enable :dump_errors, :logging
+  #enable :dump_errors, :logging
+  enable :dump_errors
   disable :show_exceptions
 
   helpers do
@@ -30,24 +32,6 @@ class Sinatra::Application
       response['Cache-Control'] = "public, max-age=#{one_year}"
     end
 
-    def login
-      json = RestClient.post('https://rpxnow.com/api/v2/auth_info',
-                             :token => params[:token],
-                             :apiKey => '8aa5b41a23857ec2bfa56f4cb3d9aedf15ae0148',
-                             :format => 'json', :extended => 'true')
-      auth_response = JSON.parse(json)
-      logger.debug "auth_response=#{auth_response.pretty_inspect}"
-
-      if auth_response['stat'] == 'ok' then
-        create_session_for(auth_response['profile']['identifier'])
-      elsif err = auth_response['err'] then
-        logger.info "Login failed; RPX auth_response #{err['code']}: #{err['msg']}"
-      else
-        logger.warn "Login failed; #{auth_response.pretty_inspect}"
-      end
-      redirect '/'
-    end
-
     def logger
       if (@_logger.nil?) then
         @_logger = Logger.new(STDERR)
@@ -60,7 +44,7 @@ class Sinatra::Application
     def halt_with_message(code, msg)
       logger.warn msg
       headers 'Warning' => msg
-      halt code, msg
+      throw :halt, code
     end
 
     def halt_on_exception(e)
@@ -73,6 +57,15 @@ class Sinatra::Application
              end
       halt_with_message(code, msg)
     end
+
+    def create_session_for(uid, email)
+      user = BusBingo::Player.get(uid) || BusBingo::Player.new(:id => uid, :email => email)
+      @session = BusBingo::Session.new user, request.ip
+      response.set_cookie(SESSION_COOKIE_NAME, {:value => @session.id, :path => '/'})
+      logger.info "Login successful - Created session for user=#{uid}, ip=#{request.ip}"
+      logger.debug "HTTP response=#{self.response.pretty_inspect}"
+    end
+    
   end
 
   # Over-ride obnoxious "Sinatra doesn't know this ditty..." page.
@@ -82,6 +75,43 @@ class Sinatra::Application
 
   error do
     halt_on_exception env['sinatra.error']
+  end
+
+  ###############
+  # Index page and login
+  get '/' do
+    if !@session then
+      redirect '/login'
+    elsif !@session.player.card
+      @session.player.new_card!
+    end
+    redirect "/cards/#{@session.player.card.id}"
+  end
+
+  get '/login' do
+    send_file('views/login.html')
+  end
+
+  # Create new session for authenticated player.
+  post '/session' do
+    json = RestClient.post('https://rpxnow.com/api/v2/auth_info',
+                           :token => params[:token],
+                           :apiKey => '8aa5b41a23857ec2bfa56f4cb3d9aedf15ae0148',
+                           :format => 'json', :extended => 'true')
+    auth_response = JSON.parse(json)
+    logger.debug "auth_response=#{auth_response.pretty_inspect}"
+
+    if auth_response['stat'] == 'ok' then
+      profile = auth_response['profile']
+      uid = profile['identifier']
+      email = profile['email']
+      create_session_for(uid, email)
+    elsif err = auth_response['err'] then
+      logger.info "Login failed; RPX auth_response #{err['code']}: #{err['msg']}"
+    else
+      logger.warn "Login failed; #{auth_response.pretty_inspect}"
+    end
+    redirect '/'
   end
 
   ###############
@@ -126,25 +156,19 @@ class Sinatra::Application
 
   # Create a new card.
   post '/cards' do
-    card = BusBingo::Card.new
-    #tileTemplates = BusBingo::TileTemplate.all(:enabled => true) # does not work with SqlLite
-    tileTemplates = []
-    nTiles = BusBingo::Card::N_ROWS * BusBingo::Card::N_COLS
-    while tileTemplates.length < nTiles do
-      tileTemplates += BusBingo::TileTemplate.all
-    end
-    card.tiles = Permutation.for(tileTemplates).random!.project(tileTemplates)[0, nTiles] \
-      .map {|tt| BusBingo::Tile.new(:tile_template => tt)}
-    card.player = BusBingo::Player.new # TODO - Player should be available from session
-    card.save
+    @session or redirect "/"
+    card = @session.player.new_card
     redirect "http://#{request.host}:#{request.port}/cards/#{card.id}"
   end
 
   # Render page with card card.
   # TODO - Replace this with '/card' or '/', id is in session
   get '/cards/:id' do
+    @session or redirect "/"
     @card = BusBingo::Card.get(params[:id]) \
       or halt 404, 'Not Found'
+    @session.player == @card.player \
+      or halt 403, 'Unauthorized'
     haml :card
   end
 
@@ -157,9 +181,12 @@ class Sinatra::Application
   # For card :id, set <row, col> to state {0 = uncovered, anything else is covered}.
   # Returns header with x-busbingo-has-bingo that matches /'[x ]{nTiles}'(, winner)?/
   put '/cards/:id' do
+    #puts(params)
+    @session or redirect "/"
     card = BusBingo::Card.get(params[:id]) \
       or halt 404, 'Not Found'
-    #puts(params)
+    @session.player == @card.player \
+      or halt 403, 'Unauthorized'
     row, col = params[:row].to_i, params[:col].to_i
     tile = card.tileAt(row, col)
     tile.covered = (params[:covered] === "true")

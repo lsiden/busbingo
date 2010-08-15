@@ -11,3 +11,5 @@ sinatra --version '~>1.0'
 thin
 permutation
 haml
+digest/sha1
+rest-client

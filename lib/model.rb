@@ -9,10 +9,10 @@ require 'dm-timestamps'
 require 'dm-validations'
 require 'bingoLogic'
 #require 'dm-types'
-#require 'json'
+require 'json'
 #require 'set'
 #require 'pp'
-#require 'digest/sha1'
+require 'digest/sha1'
 
 DataMapper.setup(:default, ENV['DATABASE_URL'] || 'sqlite3:busbingo.db')
 
@@ -93,7 +93,42 @@ module BusBingo
 		include DataMapper::Resource
 		property	:id, Serial
 		property	:email, String
-	end
+    has 1,    :session
+    has 1,    :card
+
+    def new_card!
+      self.card = BusBingo::Card.new
+      nTiles = BusBingo::Card::N_ROWS * BusBingo::Card::N_COLS
+      tileTemplates = []
+
+      while tileTemplates.length < nTiles do
+        #tileTemplates += BusBingo::TileTemplate.all(:enabled => true) # does not work with SqlLite
+        tileTemplates += BusBingo::TileTemplate.all
+      end
+      card.tiles = Permutation.for(tileTemplates).random! \
+        .project(tileTemplates)[0, nTiles] \
+        .map {|tt| BusBingo::Tile.new(:tile_template => tt)}
+      card.save
+    end
+  end
+
+  class Session
+    include DataMapper::Resource
+
+    property    :id, String, :key => true
+    belongs_to  :player
+    property    :ip,  String, :index => true
+    timestamps  :updated_at # for timing-out
+
+    def initialize(player, ip)
+      # Destroy previous sessions for same player and ip
+      self.class.all({:player => player}).each {|s| s.destroy}
+      self.class.all({:ip => ip}).each {|s| s.destroy}
+      id = Digest::SHA1.hexdigest(player.uid.to_s + ip + Time.now.to_s)
+      super :id => id, :player => player, :ip => ip
+      self.save
+    end
+  end
 end
 
 DataMapper.finalize
