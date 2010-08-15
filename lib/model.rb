@@ -69,10 +69,19 @@ module BusBingo
       self.tiles[row.to_i * N_COLS + col.to_i]
     end
 
+    def rawdata
+      (0..BusBingo::Card::N_ROWS-1).map do |i|
+        self.rowAt(i).map {|tile| tile.covered?}
+      end
+    end
+
+    protected
+
     # Return an entire row as an array
     def rowAt(row)
       self.tiles[row.to_i * N_COLS, N_COLS]
     end
+ 
   end
 
 	class Player

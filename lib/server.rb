@@ -15,6 +15,10 @@ require 'bingoLogic'
 
 class Sinatra::Application
 
+  # some configuration
+  enable :dump_errors, :logging
+  disable :show_exceptions
+
   helpers do
 
     def set_long_expiration_header
@@ -30,13 +34,11 @@ class Sinatra::Application
       response['Expires'] = time
       response['Cache-Control'] = "public, max-age=#{one_year}"
     end
-  end
 
   # some configuration
   enable :dump_errors, :logging
   disable :show_exceptions
 
-  helpers do
     def logger
       if (@_logger.nil?) then
         @_logger = Logger.new(STDERR)
@@ -134,6 +136,8 @@ class Sinatra::Application
   get '/cards/:id' do
     @card = BusBingo::Card.get(params[:id]) \
       or halt 404, 'Not Found'
+    bingoLogic = BingoLogic::BingoCard.new(@card.rawdata)
+    headers 'x-busbingo-has-bingo' => bingoLogic.bingo? ? "true" : "false"
     haml :card
   end
 
@@ -153,11 +157,7 @@ class Sinatra::Application
     tile.covered = (params[:covered] === "true")
     tile.save
 
-    data = (0..BusBingo::Card::N_ROWS-1).map do |i|
-      card.rowAt(i).map {|tile| tile.covered? ? 'x' : ' '}
-    end
-    #pp data
-    bingoLogic = BingoLogic::BingoCard.new(data)
+    bingoLogic = BingoLogic::BingoCard.new(card.rawdata)
     headers 'x-busbingo-has-bingo' => bingoLogic.bingo? ? "true" : "false"
     status 200
   end

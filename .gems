@@ -9,3 +9,5 @@ dm-validations
 json --version '~>1.0'
 sinatra --version '~>1.0'
 thin
+permutation
+haml
