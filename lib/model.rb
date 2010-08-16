@@ -8,12 +8,13 @@ require 'dm-is-list'
 require 'dm-timestamps'
 require 'dm-validations'
 require 'bingoLogic'
-#require 'dm-types'
 require 'json'
-#require 'set'
-#require 'pp'
 require 'digest/sha1'
 require 'bb_logger'
+require 'permutation'
+#require 'dm-types'
+#require 'set'
+#require 'pp'
 
 DataMapper.setup(:default, ENV['DATABASE_URL'] || 'sqlite3:busbingo.db')
 
@@ -148,6 +149,14 @@ end
 
 DataMapper.finalize
 
-# TODO
-DataMapper.auto_upgrade! # for production
-#DataMapper.auto_migrate!  # for testing - will destroy any existing data!
+require 'socket'
+require 'set'
+
+hostname = Socket.gethostname
+
+if %w(morpheus lsiden-laptop).to_set.include?(hostname) then
+	DataMapper.auto_migrate!  # for testing - will destroy any existing data!
+	load File.dirname(__FILE__) + "/../scripts/insert-tiles.rb"
+else
+	DataMapper.auto_upgrade! # for production
+end

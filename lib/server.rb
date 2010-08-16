@@ -8,7 +8,6 @@ require 'rest_client'
 require 'bb_logger'
 require 'pp'
 require 'model'
-require 'permutation'
 require 'haml'
 require 'rest_client'
 require 'digest/sha1'
@@ -26,20 +25,6 @@ class Sinatra::Application
 
     SESSION_COOKIE_NAME = 'x-busbingo-session-id'
 
-    # This session is different from env[rack.session].
-    # It's maintained in the model.
-    def get_session!
-      # Insure that caller has a session.
-      session_id = request.cookies[SESSION_COOKIE_NAME]
-      logger.debug "#{path}: session_id=#{session_id}"
-      return nil unless session_id
-
-      session = BusBingo::Session.get(session_id)
-      logger.debug "#{path}: session=#{session.pretty_inspect}"
-      session.save # reset :updated_at on session
-      return session
-    end
-
     def set_long_expiration_header
       # set long expiration headers  
       one_year = 360 * 24 * 60 * 60 # a little less than a year for proxy's-sake
@@ -56,7 +41,24 @@ class Sinatra::Application
       player ||= BusBingo::Player.create(:id => digest_id, :email => email)
       player.session = BusBingo::Session.new(:ip => request.ip)
       player.save
+			logger.debug("create_session_for: session:")
+			logger.debug session.pretty_inspect
       return player.session
+    end
+
+    # This session is different from env[rack.session].
+    # It's maintained in the model.
+    def get_session
+      # Insure that caller has a session.
+      session_id = request.cookies[SESSION_COOKIE_NAME]
+      logger.debug "#{request.path}: session_id=#{session_id}"
+      return nil unless session_id
+
+      session = BusBingo::Session.get(session_id)
+      session.save if session # reset :updated_at on session to note login
+      logger.debug "get_session: session:"
+			logger.debug session.pretty_inspect
+      return session
     end
     
   end
@@ -85,14 +87,16 @@ class Sinatra::Application
                            :apiKey => 'a684c5b0305f61508c906b4ca8da609a8ba3c257',
                            :format => 'json', :extended => 'true')
     auth_response = JSON.parse(json)
-    logger.debug "auth_response=#{auth_response.pretty_inspect}"
+    logger.debug "post /sessions: auth_response:"
+		logger.debug auth_response.pretty_inspect
 
     if auth_response['stat'] == 'ok' then
       profile = auth_response['profile']
       player_id = profile['identifier']
       email = profile['email']
       session = create_session_for(player_id, email)
-      logger.info "Login successful - Created session for player=#{player_id}, ip=#{request.ip}"
+      logger.info "post /sessions - session:"
+			logger.info session.pretty_inspect
       response.set_cookie(SESSION_COOKIE_NAME, {:value => session.id, :path => '/'})
       #logger.debug "HTTP response=#{self.response.pretty_inspect}"
       session.player.card = BusBingo::Card.new
@@ -156,9 +160,9 @@ class Sinatra::Application
   # TODO - Replace this with '/card' or '/', id is in session
   get '/cards/:id' do
     session = get_session or redirect "/"
-    @card = BusBingo::Card.get(params[:id]) \
-      or halt 404, 'Not Found'
-    session.player == @card.player \
+		@card = session.player.card # Make card accessable to HAML
+		logger.debug "get #{request.path}: card.id=#{@card.id}"
+    params[:id].to_i == @card.id \
       or halt 403, 'Unauthorized'
     haml :card
   end
@@ -174,9 +178,9 @@ class Sinatra::Application
   put '/cards/:id' do
     #puts(params)
     session = get_session or redirect "/"
-    card = BusBingo::Card.get(params[:id]) \
-      or halt 404, 'Not Found'
-    session.player == @card.player \
+		card = session.player.card
+		logger.debug "put #{request.path}: card.id=#{card.id}"
+    params[:id].to_i == card.id \
       or halt 403, 'Unauthorized'
     row, col = params[:row].to_i, params[:col].to_i
     tile = card.tileAt(row, col)
