@@ -96,7 +96,7 @@ class Sinatra::Application
   post '/session' do
     json = RestClient.post('https://rpxnow.com/api/v2/auth_info',
                            :token => params[:token],
-                           :apiKey => '8aa5b41a23857ec2bfa56f4cb3d9aedf15ae0148',
+                           :apiKey => 'a684c5b0305f61508c906b4ca8da609a8ba3c257',
                            :format => 'json', :extended => 'true')
     auth_response = JSON.parse(json)
     logger.debug "auth_response=#{auth_response.pretty_inspect}"
