@@ -5,22 +5,40 @@ require 'sinatra'
 require 'json'
 require 'digest/sha1'
 require 'rest_client'
-require 'logger'
+require 'bb_logger'
 require 'pp'
 require 'model'
 require 'permutation'
 require 'haml'
 require 'rest_client'
+require 'digest/sha1'
 #require 'fileutils'
 
 class Sinatra::Application
 
   # some configuration
   #enable :dump_errors, :logging
-  enable :dump_errors
-  disable :show_exceptions
+  #enable :dump_errors
+  #disable :show_exceptions
 
   helpers do
+    include BusBingo
+
+    SESSION_COOKIE_NAME = 'x-busbingo-session-id'
+
+    # This session is different from env[rack.session].
+    # It's maintained in the model.
+    def get_session!
+      # Insure that caller has a session.
+      session_id = request.cookies[SESSION_COOKIE_NAME]
+      logger.debug "#{path}: session_id=#{session_id}"
+      return nil unless session_id
+
+      session = BusBingo::Session.get(session_id)
+      logger.debug "#{path}: session=#{session.pretty_inspect}"
+      session.save # reset :updated_at on session
+      return session
+    end
 
     def set_long_expiration_header
       # set long expiration headers  
@@ -32,68 +50,35 @@ class Sinatra::Application
       response['Cache-Control'] = "public, max-age=#{one_year}"
     end
 
-    def logger
-      if (@_logger.nil?) then
-        @_logger = Logger.new(STDERR)
-        log_level = ENV['LOG_LEVEL'] || 'INFO'
-        @_logger.level = eval("Logger::#{log_level}")
-      end
-      @_logger
-    end
-
-    def halt_with_message(code, msg)
-      logger.warn msg
-      headers 'Warning' => msg
-      throw :halt, code
-    end
-
-    def halt_on_exception(e)
-      msg = "#{e.class.to_s}, #{e.message}"
-      code = case e.class
-             when JSON::ParserError then
-               403
-             else
-               500
-             end
-      halt_with_message(code, msg)
-    end
-
-    def create_session_for(uid, email)
-      user = BusBingo::Player.get(uid) || BusBingo::Player.new(:id => uid, :email => email)
-      @session = BusBingo::Session.new user, request.ip
-      response.set_cookie(SESSION_COOKIE_NAME, {:value => @session.id, :path => '/'})
-      logger.info "Login successful - Created session for user=#{uid}, ip=#{request.ip}"
-      logger.debug "HTTP response=#{self.response.pretty_inspect}"
+    def create_session_for(player_id, email)
+      digest_id = Digest::SHA1.hexdigest(player_id) 
+      player = BusBingo::Player.get(digest_id)
+      player ||= BusBingo::Player.create(:id => digest_id, :email => email)
+      BusBingo::Session.create(:player => player, :ip => request.ip)
     end
     
   end
 
   # Over-ride obnoxious "Sinatra doesn't know this ditty..." page.
   not_found do
-    halt_with_message 404, "Path not found: #{request.path}"
-  end
-
-  error do
-    halt_on_exception env['sinatra.error']
+    throw :halt, [404, "Path not found: #{request.path}"]
   end
 
   ###############
   # Index page and login
   get '/' do
-    if !@session then
-      redirect '/login'
-    elsif !@session.player.card
-      @session.player.new_card!
-    end
-    redirect "/cards/#{@session.player.card.id}"
+    session = get_session or redirect '/login'
+    session.player.new_card! unless session.player.card
+    redirect "/cards/#{session.player.card.id}"
   end
 
   get '/login' do
-    send_file('views/login.html')
+    send_file('lib/views/login.html')
   end
 
   # Create new session for authenticated player.
-  post '/session' do
+  post '/sessions' do
+    logger.debug "token=#{params[:token]}"
     json = RestClient.post('https://rpxnow.com/api/v2/auth_info',
                            :token => params[:token],
                            :apiKey => 'a684c5b0305f61508c906b4ca8da609a8ba3c257',
@@ -103,15 +88,19 @@ class Sinatra::Application
 
     if auth_response['stat'] == 'ok' then
       profile = auth_response['profile']
-      uid = profile['identifier']
+      player_id = profile['identifier']
       email = profile['email']
-      create_session_for(uid, email)
+      session = create_session_for(player_id, email)
+      logger.info "Login successful - Created session for player=#{player_id}, ip=#{request.ip}"
+      response.set_cookie(SESSION_COOKIE_NAME, {:value => session.id, :path => '/'})
+      logger.debug "HTTP response=#{self.response.pretty_inspect}"
+      card = session.player.new_card!
+      redirect "/cards/#{card.id}"
     elsif err = auth_response['err'] then
-      logger.info "Login failed; RPX auth_response #{err['code']}: #{err['msg']}"
+      throw :halt, [403, "Login failed; RPX auth_response #{err['code']}: #{err['msg']}"]
     else
-      logger.warn "Login failed; #{auth_response.pretty_inspect}"
+      throw :halt, [500, "Login failed; #{auth_response.pretty_inspect}"]
     end
-    redirect '/'
   end
 
   ###############
@@ -148,7 +137,7 @@ class Sinatra::Application
 
   get '/mockup' do
     #FileUtils.pwd
-    send_file('views/mock.html')
+    send_file('lib/views/mock.html')
   end
 
   ###############
@@ -156,18 +145,18 @@ class Sinatra::Application
 
   # Create a new card.
   post '/cards' do
-    @session or redirect "/"
-    card = @session.player.new_card
+    session = get_session or redirect "/"
+    card = session.player.new_card
     redirect "http://#{request.host}:#{request.port}/cards/#{card.id}"
   end
 
   # Render page with card card.
   # TODO - Replace this with '/card' or '/', id is in session
   get '/cards/:id' do
-    @session or redirect "/"
+    session = get_session or redirect "/"
     @card = BusBingo::Card.get(params[:id]) \
       or halt 404, 'Not Found'
-    @session.player == @card.player \
+    session.player == @card.player \
       or halt 403, 'Unauthorized'
     haml :card
   end
@@ -182,10 +171,10 @@ class Sinatra::Application
   # Returns header with x-busbingo-has-bingo that matches /'[x ]{nTiles}'(, winner)?/
   put '/cards/:id' do
     #puts(params)
-    @session or redirect "/"
+    session = get_session or redirect "/"
     card = BusBingo::Card.get(params[:id]) \
       or halt 404, 'Not Found'
-    @session.player == @card.player \
+    session.player == @card.player \
       or halt 403, 'Unauthorized'
     row, col = params[:row].to_i, params[:col].to_i
     tile = card.tileAt(row, col)
@@ -200,7 +189,7 @@ class Sinatra::Application
 
   get '/favicon.ico' do
     set_long_expiration_header
-    send_file('views/images/favicon.ico');
+    send_file('lib/views/images/favicon.ico');
   end
 
   get '/views/*' do
