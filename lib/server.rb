@@ -54,7 +54,9 @@ class Sinatra::Application
       digest_id = Digest::SHA1.hexdigest(player_id) 
       player = BusBingo::Player.get(digest_id)
       player ||= BusBingo::Player.create(:id => digest_id, :email => email)
-      BusBingo::Session.create(:player => player, :ip => request.ip)
+      player.session = BusBingo::Session.new(:ip => request.ip)
+      player.save
+      return player.session
     end
     
   end
@@ -68,7 +70,6 @@ class Sinatra::Application
   # Index page and login
   get '/' do
     session = get_session or redirect '/login'
-    session.player.new_card! unless session.player.card
     redirect "/cards/#{session.player.card.id}"
   end
 
@@ -93,9 +94,10 @@ class Sinatra::Application
       session = create_session_for(player_id, email)
       logger.info "Login successful - Created session for player=#{player_id}, ip=#{request.ip}"
       response.set_cookie(SESSION_COOKIE_NAME, {:value => session.id, :path => '/'})
-      logger.debug "HTTP response=#{self.response.pretty_inspect}"
-      card = session.player.new_card!
-      redirect "/cards/#{card.id}"
+      #logger.debug "HTTP response=#{self.response.pretty_inspect}"
+      session.player.card = BusBingo::Card.new
+      session.player.save
+      redirect "/cards/#{session.player.card.id}"
     elsif err = auth_response['err'] then
       throw :halt, [403, "Login failed; RPX auth_response #{err['code']}: #{err['msg']}"]
     else

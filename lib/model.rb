@@ -84,6 +84,22 @@ module BusBingo
       BingoLogic::BingoCard.new(self.rawdata).has_bingo?(row, col)
     end
 
+    def initialize
+      BusBingo::TileTemplate.count > 0 \
+        or raise "Cannot create new card; there are no tiles defined"
+
+      nTiles = BusBingo::Card::N_ROWS * BusBingo::Card::N_COLS
+      tileTemplates = []
+
+      while tileTemplates.length < nTiles do
+        #tileTemplates += BusBingo::TileTemplate.all(:enabled => true) # does not work with SqlLite
+        tileTemplates += BusBingo::TileTemplate.all
+      end
+      self.tiles = Permutation.for(tileTemplates).random! \
+        .project(tileTemplates)[0, nTiles] \
+        .map {|tt| BusBingo::Tile.new(:tile_template => tt)}
+    end
+
     protected
 
     def rawdata
@@ -99,34 +115,6 @@ module BusBingo
  
   end
 
-	class Player
-		include DataMapper::Resource
-		property	:id, String, :key => true # OpenID URL
-		property	:email, String
-
-    has 1,    :card
-
-    def new_card!
-      BusBingo::TileTemplate.count > 0 \
-        or raise "Cannot create new card; there are no tiles defined"
-
-      nTiles = BusBingo::Card::N_ROWS * BusBingo::Card::N_COLS
-      tileTemplates = []
-
-      while tileTemplates.length < nTiles do
-        #tileTemplates += BusBingo::TileTemplate.all(:enabled => true) # does not work with SqlLite
-        tileTemplates += BusBingo::TileTemplate.all
-      end
-      self.card = BusBingo::Card.new
-  pp self.card
-      self.card.tiles = Permutation.for(tileTemplates).random! \
-        .project(tileTemplates)[0, nTiles] \
-        .map {|tt| BusBingo::Tile.new(:tile_template => tt)}
-      self.save
-      self.card
-    end
-  end
-
   class Session
     include DataMapper::Resource
 
@@ -137,16 +125,24 @@ module BusBingo
     belongs_to  :player
 
     def initialize(attrs)
-      player = attrs[:player]
       ip = attrs[:ip]
 
       # Destroy previous sessions for same player and ip
-      self.class.all({:player => player}).each {|s| s.destroy}
+      #self.class.all({:player => player}).each {|s| s.destroy}
       self.class.all({:ip => ip}).each {|s| s.destroy}
 
-      attrs[:id] = Digest::SHA1.hexdigest(player.id.to_s + ip + Time.now.to_s)
+      attrs[:id] = Digest::SHA1.hexdigest(ip + Time.now.to_s)
       super attrs
     end
+  end
+
+	class Player
+		include DataMapper::Resource
+		property	:id, String, :key => true # OpenID URL
+		property	:email, String
+
+    has 1,    :card
+    has 1,    :session
   end
 end
 
