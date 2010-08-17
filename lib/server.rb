@@ -17,8 +17,7 @@ class Sinatra::Application
 
   # some configuration
   #enable :dump_errors, :logging
-  #enable :dump_errors
-  #disable :show_exceptions
+  disable :logging
 
   helpers do
     include BusBingo::Helpers
