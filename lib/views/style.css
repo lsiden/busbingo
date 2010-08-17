@@ -12,17 +12,17 @@ h1 {
   position: absolute;
 }
 
-.cell .row0 { top: 0cm; }
-.cell .row1 { top: 4cm; }
-.cell .row2 { top: 8cm; }
-.cell .row3 { top: 12cm; }
-.cell .row4 { top: 16cm; }
+.cell.row0 { top: 0cm; }
+.cell.row1 { top: 4cm; }
+.cell.row2 { top: 8cm; }
+.cell.row3 { top: 12cm; }
+.cell.row4 { top: 16cm; }
 
-.cell .col0 { left: 0cm; }
-.cell .col1 { left: 4cm; }
-.cell .col2 { left: 8cm; }
-.cell .col3 { left: 12cm; }
-.cell .col4 { left: 16cm; }
+.cell.col0 { left: 0cm; }
+.cell.col1 { left: 4cm; }
+.cell.col2 { left: 8cm; }
+.cell.col3 { left: 12cm; }
+.cell.col4 { left: 16cm; }
 
 .cell img {
   height: 3cm;
@@ -31,19 +31,19 @@ h1 {
   padding: 0.5cm;
 }
 
-.cell div.cell.picture:hover {
+div.cell.picture:hover {
   background-color: red;
 }
 
-.cell div.checkmark {
+.cell.checkmark {
   display: none;
 }
 
-.cell div.checkmark.on {
+.cell.checkmark.on {
   display: block;
 }
 
-.cell .checkmark img {
+.cell.checkmark img {
   opacity: .85;
 }
 
