@@ -28,8 +28,8 @@
           - tt = tile.tile_template
           %div{:class => [%w(cell picture), "row#{row}", "col#{col}"]}
             %a{:href => "#"}
-              %img{:src => "/views/images/#{tt.image_filename}", :title => tt.title, :alt => tt.alt }
+              %img{:src => "/views/images/#{tt.image_filename}", :title => tt.desc, :alt => tt.name }
           %div{:class => [%w(cell checkmark), "row#{row}", "col#{col}", tile.covered? && "on"]}
             %a{:href => "#"}
-              %img{:src => "/views/images/checkmark.png", :title => tt.title, :alt => tt.alt }
+              %img{:src => "/views/images/checkmark.png", :title => tt.desc, :alt => tt.name }
           - i += 1

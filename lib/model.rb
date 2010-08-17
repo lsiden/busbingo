@@ -47,9 +47,8 @@ end
 module BusBingo
 	class TileTemplate
 		include DataMapper::Resource
-		property	:id, Serial
-		property	:title, Text
-		property	:alt, String
+		property	:name, String, :key => true
+		property	:desc, Text
 		property	:image_filename, String		# name of image file without pathname
 		property	:enabled?, Boolean				# whether to include this image in new cards
 
