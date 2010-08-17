@@ -14,13 +14,17 @@
 
   %body#card
     -# = pp @card
+    %hidden#card-id{:value => "#{@card.id}"}
+
+    #logout
+      %a{:href => '/login', :onclick => "logout(); return true;", :title => "Log out"}
+        Logout
     %h1
       Bus Bingo 
       %span#you-have-bingo{:class => @card.has_bingo? && "on"}
         %span#you-have-bingo-inside - You have Bingo!
 
     %div#bingo-card
-      %hidden#card-id{:value => "#{@card.id}"}
       - i = 0
       - (0..4).each do |row|
         - (0..4).each do |col|
@@ -33,3 +37,4 @@
             %a{:href => "#"}
               %img{:src => "/views/images/checkmark.png", :title => tt.desc, :alt => tt.name }
           - i += 1
+    %div#copyright= @copyright

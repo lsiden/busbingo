@@ -59,8 +59,11 @@ class Sinatra::Application
 			logger.debug session.pretty_inspect
       return session
     end
-    
   end
+
+  before do
+    @copyright = 'Copyright&copy; 2010, Lawrence Siden, <a href="http://westside-consulting.com/">Westside Consulting LLC</a>, Ann Arbor, MI, USA'
+  end 
 
   # Over-ride obnoxious "Sinatra doesn't know this ditty..." page.
   not_found do
@@ -101,6 +104,8 @@ class Sinatra::Application
       response.set_cookie(SESSION_COOKIE_NAME, {:value => session.id, :path => '/'})
       #logger.debug "HTTP response=#{self.response.pretty_inspect}"
       session.player.card = BusBingo::Card.new
+      logger.debug "POST /sessions: player="
+      logger.debug session.player.pretty_inspect
       session.player.save
       redirect '/play'
     elsif err = auth_response['err'] then

@@ -6,6 +6,7 @@ h1 {
 
 #bingo-card {
   position: relative;
+  height: 20cm;
 }
 
 #bingo-card .cell {
@@ -75,4 +76,14 @@ background-color: #CCC;
   left: 4cm;
   text-align: center;
   margin-top: 1.5cm;
+}
+
+#copyright {
+  margin: 0.75cm 3cm;
+}
+
+#logout {
+  position: absolute;
+  right: 0;
+  margin-right: 1cm;
 }
