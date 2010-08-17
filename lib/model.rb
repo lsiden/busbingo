@@ -10,11 +10,13 @@ require 'dm-validations'
 require 'bingoLogic'
 require 'json'
 require 'digest/sha1'
-require 'bb_logger'
+require 'helpers'
 require 'permutation'
 #require 'dm-types'
 #require 'set'
 #require 'pp'
+
+include BusBingo::Helpers
 
 DataMapper.setup(:default, ENV['DATABASE_URL'] || 'sqlite3:busbingo.db')
 
@@ -24,7 +26,6 @@ DataMapper::Model.raise_on_save_failure = true
 # http://github.com/datamapper/dm-core/blob/master/lib/dm-core/resource.rb
 module DataMapper
   module Resource
-    include BusBingo
 
     alias_method :orig_save, :save
 
@@ -149,12 +150,7 @@ end
 
 DataMapper.finalize
 
-require 'socket'
-require 'set'
-
-hostname = Socket.gethostname
-
-if %w(morpheus lsiden-laptop).to_set.include?(hostname) then
+if localhost? then
 	DataMapper.auto_migrate!  # for testing - will destroy any existing data!
 	load File.dirname(__FILE__) + "/../scripts/insert-tiles.rb"
 else

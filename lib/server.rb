@@ -5,7 +5,7 @@ require 'sinatra'
 require 'json'
 require 'digest/sha1'
 require 'rest_client'
-require 'bb_logger'
+require 'helpers'
 require 'pp'
 require 'model'
 require 'haml'
@@ -21,7 +21,7 @@ class Sinatra::Application
   #disable :show_exceptions
 
   helpers do
-    include BusBingo
+    include BusBingo::Helpers
 
     SESSION_COOKIE_NAME = 'x-busbingo-session-id'
 
@@ -76,7 +76,9 @@ class Sinatra::Application
   end
 
   get '/login' do
-    send_file('lib/views/login.html')
+		# URL that rpxnow.com will post to after authenticating user credentials
+		@token_url = (localhost? ? 'localhost:9292' : 'busbingo.heroku.com') + '/sessions'
+		haml :login
   end
 
   # Create new session for authenticated player.
