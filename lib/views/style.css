@@ -8,50 +8,50 @@ h1 {
   position: relative;
 }
 
-.cell {
+#bingo-card .cell {
   position: absolute;
 }
 
-.row0 { top: 0cm; }
-.row1 { top: 4cm; }
-.row2 { top: 8cm; }
-.row3 { top: 12cm; }
-.row4 { top: 16cm; }
+.cell .row0 { top: 0cm; }
+.cell .row1 { top: 4cm; }
+.cell .row2 { top: 8cm; }
+.cell .row3 { top: 12cm; }
+.cell .row4 { top: 16cm; }
 
-.col0 { left: 0cm; }
-.col1 { left: 4cm; }
-.col2 { left: 8cm; }
-.col3 { left: 12cm; }
-.col4 { left: 16cm; }
+.cell .col0 { left: 0cm; }
+.cell .col1 { left: 4cm; }
+.cell .col2 { left: 8cm; }
+.cell .col3 { left: 12cm; }
+.cell .col4 { left: 16cm; }
 
-img {
+.cell img {
   height: 3cm;
   width: 3cm;
   border: solid black 0.1cm;
   padding: 0.5cm;
 }
 
-div.cell.picture:hover {
+.cell div.cell.picture:hover {
   background-color: red;
 }
 
-div.checkmark {
+.cell div.checkmark {
   display: none;
 }
 
-div.checkmark.on {
+.cell div.checkmark.on {
   display: block;
 }
 
-.checkmark img {
+.cell .checkmark img {
   opacity: .85;
 }
 
-#you-have-bingo {
+#card #you-have-bingo {
   display: none;
 }
 
-#you-have-bingo.on {
+#card #you-have-bingo.on {
   display: inline;
   color: green;
 }
@@ -61,3 +61,18 @@ a:active {
 background-color: #CCC;
 }
 */
+
+#login #sign-in {
+  top: 2cm;
+  left: 8cm;
+  font-size: xx-large;
+  text-align: center;
+  margin-top: 1.5cm;
+}
+
+#login #photo {
+  top: 6cm;
+  left: 4cm;
+  text-align: center;
+  margin-top: 1.5cm;
+}

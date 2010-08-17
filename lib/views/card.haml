@@ -1,8 +1,7 @@
 !!! Strict
 / Copyright 2010, Westside Consulting LLC, Ann Arbor, MI, USA
 
-%html(xmlns = "http://www.w3.org/1999/xhtml")
-
+%html{html_attrs}
   :plain
     <head>
       <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
@@ -13,7 +12,7 @@
       <link rel="stylesheet" href="/views/style.css" type="text/css" media="all" />
     </head>
 
-  %body
+  %body#card
     -# = pp @card
     %h1
       Bus Bingo 
