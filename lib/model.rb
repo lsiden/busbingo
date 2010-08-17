@@ -77,6 +77,7 @@ module BusBingo
 
     N_ROWS = 5
     N_COLS = 5
+    N_TILES = N_ROWS * N_COLS
 
     def tileAt(row, col)
       self.tiles[row.to_i * N_COLS + col.to_i]
@@ -90,16 +91,14 @@ module BusBingo
       BusBingo::TileTemplate.count > 0 \
         or raise "Cannot create new card; there are no tiles defined"
 
-      nTiles = BusBingo::Card::N_ROWS * BusBingo::Card::N_COLS
-      tileTemplates = []
+      all_templates = BusBingo::TileTemplate.all #(:enabled => true) # does not work in SqlLite
+      selected_templates = []
 
-      while tileTemplates.length < nTiles do
-        #tileTemplates += BusBingo::TileTemplate.all(:enabled => true) # does not work with SqlLite
-        tileTemplates += BusBingo::TileTemplate.all
+      while selected_templates.length < N_TILES do
+        # Shake the coffee-can and select more tiles.
+        selected_templates += Permutation.for(all_templates).random!.project(all_templates)
       end
-      self.tiles = Permutation.for(tileTemplates).random! \
-        .project(tileTemplates)[0, nTiles] \
-        .map {|tt| BusBingo::Tile.new(:tile_template => tt)}
+      self.tiles = selected_templates[0, N_TILES].map {|tt| BusBingo::Tile.new(:tile_template => tt)}
     end
 
     protected
