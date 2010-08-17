@@ -1,6 +1,7 @@
 require 'logger'
 require 'socket'
 require 'set'
+require 'uri'
 
 module BusBingo
   module Helpers
@@ -17,6 +18,11 @@ module BusBingo
     # Returns true iff app is running on a know local host.
     def localhost?
       %w(morpheus lsiden-laptop).to_set.include?(Socket.gethostname)
+    end
+
+    def uri_encode(s)
+      # Got this snippet from http://snippets.dzone.com/posts/show/1260
+      URI.escape(s, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
     end
   end
 end
