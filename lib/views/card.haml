@@ -20,6 +20,7 @@
         %span#you-have-bingo-inside - You have Bingo!
 
     %div#bingo-card
+      %hidden#card-id{:value => "#{@card.id}"}
       - i = 0
       - (0..4).each do |row|
         - (0..4).each do |col|

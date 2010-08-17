@@ -71,8 +71,7 @@ class Sinatra::Application
   ###############
   # Index page and login
   get '/' do
-    session = get_session or redirect '/login'
-    redirect "/cards/#{session.player.card.id}"
+    redirect get_session ? '/play' : '/login'
   end
 
   get '/login' do
@@ -104,7 +103,7 @@ class Sinatra::Application
       #logger.debug "HTTP response=#{self.response.pretty_inspect}"
       session.player.card = BusBingo::Card.new
       session.player.save
-      redirect "/cards/#{session.player.card.id}"
+      redirect '/play'
     elsif err = auth_response['err'] then
       #throw :halt, [403, "Login failed; RPX auth_response #{err['code']}: #{err['msg']}"]
       logger.error "Login failed; RPX auth_response #{err['code']}: #{err['msg']}"
@@ -157,20 +156,20 @@ class Sinatra::Application
   # Games
 
   # Create a new card.
+=begin
   post '/cards' do
     session = get_session or redirect "/"
     card = session.player.new_card
-    redirect "http://#{request.host}:#{request.port}/cards/#{card.id}"
+    redirect "http://#{request.host}:#{request.port}/play"
   end
+=end
 
   # Render page with card card.
   # TODO - Replace this with '/card' or '/', id is in session
-  get '/cards/:id' do
+  #get '/cards/:id' do
+  get '/play' do
     session = get_session or redirect "/"
 		@card = session.player.card # Make card accessable to HAML
-		logger.debug "get #{request.path}: card.id=#{@card.id}"
-    params[:id].to_i == @card.id \
-      or halt 403, 'Unauthorized'
     haml :card
   end
 
