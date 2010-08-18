@@ -12,3 +12,5 @@ thin
 permutation
 haml
 rest-client
+syntax
+maruku

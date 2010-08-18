@@ -86,10 +86,11 @@ module BusBingo
       BingoLogic::BingoCard.new(self.rawdata).has_bingo?(row, col)
     end
 
-    def initialize
+    def initialize(*a)
       BusBingo::TileTemplate.count > 0 \
         or raise "Cannot create new card; there are no tiles defined"
 
+      super
       all_templates = BusBingo::TileTemplate.all #(:enabled => true) # does not work in SqlLite
       selected_templates = []
 
@@ -126,12 +127,10 @@ module BusBingo
 
     def initialize(attrs)
       ip = attrs[:ip]
-
       # Destroy previous sessions for same player and ip
       #self.class.all({:player => player}).each {|s| s.destroy}
       self.class.all({:ip => ip}).each {|s| s.destroy}
-
-      attrs[:id] = Digest::SHA1.hexdigest(ip + Time.now.to_s)
+      self.id = Digest::SHA1.hexdigest(ip + Time.now.to_s)
       super attrs
     end
   end

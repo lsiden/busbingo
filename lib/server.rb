@@ -11,6 +11,7 @@ require 'model'
 require 'haml'
 require 'rest_client'
 require 'digest/sha1'
+require 'maruku'
 #require 'fileutils'
 
 class Sinatra::Application
@@ -34,15 +35,19 @@ class Sinatra::Application
       response['Cache-Control'] = "public, max-age=#{one_year}"
     end
 
-    def create_session_for(player_id, email)
+    # Returns player with session.
+    # Creates player if he does not already exist.
+    def get_player_with_session(player_id, email)
       digest_id = Digest::SHA1.hexdigest(player_id) 
-      player = BusBingo::Player.get(digest_id)
-      player ||= BusBingo::Player.create(:id => digest_id, :email => email)
+      player = BusBingo::Player.get(digest_id) or begin
+        player = BusBingo::Player.create(:id => digest_id, :email => email)
+        player.card = BusBingo::Card.new
+      end
       player.session = BusBingo::Session.new(:ip => request.ip)
       player.save
-			logger.debug("create_session_for: session:")
-			logger.debug session.pretty_inspect
-      return player.session
+			logger.debug("create_player_with_session: player:")
+			logger.debug player.pretty_inspect
+      return player
     end
 
     # This session is different from env[rack.session].
@@ -98,15 +103,9 @@ class Sinatra::Application
       profile = auth_response['profile']
       player_id = profile['identifier']
       email = profile['email']
-      session = create_session_for(player_id, email)
-      logger.info "post /sessions - session:"
-			logger.info session.pretty_inspect
-      response.set_cookie(SESSION_COOKIE_NAME, {:value => session.id, :path => '/'})
-      #logger.debug "HTTP response=#{self.response.pretty_inspect}"
-      session.player.card = BusBingo::Card.new
-      logger.debug "POST /sessions: player="
-      logger.debug session.player.pretty_inspect
-      session.player.save
+      player = get_player_with_session(player_id, email)
+      response.set_cookie(SESSION_COOKIE_NAME, {:value => player.session.id, :path => '/'})
+      logger.debug "HTTP response=#{self.response.pretty_inspect}"
       redirect '/play'
     elsif err = auth_response['err'] then
       #throw :halt, [403, "Login failed; RPX auth_response #{err['code']}: #{err['msg']}"]
@@ -206,6 +205,14 @@ class Sinatra::Application
   get '/favicon.ico' do
     set_long_expiration_header
     send_file('lib/views/images/favicon.ico');
+  end
+
+  get '/about' do
+    haml :about
+  end
+
+  get '/privacy' do
+    haml :privacy
   end
 
   get '/views/*' do
