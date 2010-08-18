@@ -1,9 +1,5 @@
 /* Copyright 2010, Westside Consulting LLC, Ann Arbor, MI, USA */
 
-h1 {
-  padding: 0.5em 1em;
-}
-
 #bingo-card {
   position: relative;
   height: 20cm;
@@ -82,15 +78,15 @@ background-color: #CCC;
   margin: 0.75cm 3cm;
 }
 
-#logout {
-  position: absolute;
-  right: 0;
+#menu {
+  float: right;
   margin-right: 1cm;
 }
 
 #page-header {
   position: relative;
   height: 3.5cm;
+  width: 40em;
 }
 
 #page-header img#girl {
@@ -100,8 +96,10 @@ background-color: #CCC;
 
 #page-header h1 {
   position: absolute;
-  left: 3.5cm;
+  left: 4.5cm;
 }
 
-#privacy #content, #about #content {
+#card #page-header h1 {
+  position: relative;
+  left: 0;
 }
