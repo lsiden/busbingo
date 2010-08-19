@@ -98,9 +98,11 @@ module BusBingo
       selected_templates = []
 
       while selected_templates.length < N_TILES do
-        # Shake the coffee-can and select more tiles.
+        # Put the tiles in a coffee-can and shake!
         selected_templates += Permutation.for(all_templates).random!.project(all_templates)
       end
+      # Now shake the selected ones again!
+      selected_templates = Permutation.for(selected_templates).random!.project(selected_templates)
       self.tiles = selected_templates[0, N_TILES].map {|tt| BusBingo::Tile.new(:tile_template => tt)}
       super
     end
