@@ -30,7 +30,11 @@ module DataMapper
     alias_method :orig_save, :save
 
     def save(*a)
-      self.errors.each {|e| logger.warn e} if (!self.valid?)
+      if (!self.valid?) then
+        self.errors.each {|e| logger.warn e}
+        STDERR.puts self.pretty_inspect
+        raise "Cannot save instance of #{self.class.to_s}"
+      end
       orig_save(*a)
     end
 
@@ -45,31 +49,31 @@ module DataMapper
 end
 
 module BusBingo
-	class TileTemplate
-		include DataMapper::Resource
-		property	:name, String, :key => true
-		property	:desc, Text
-		property	:image_filename, String		# name of image file without pathname
-		property	:enabled?, Boolean				# whether to include this image in new cards
+  class TileTemplate
+    include DataMapper::Resource
+    property  :name, String, :key => true
+    property  :desc, Text
+    property  :image_filename, String   # name of image file without pathname
+    property  :enabled?, Boolean        # whether to include this image in new cards
 
     has n,    :tiles
-	end
+  end
 
-	class Tile
-		include DataMapper::Resource
-		property	:id, Serial
-		property	:covered?, Boolean				# whether this tile on the card is covered
-		property	:updated_at, DateTime
+  class Tile
+    include DataMapper::Resource
+    property  :id, Serial
+    property  :covered?, Boolean        # whether this tile on the card is covered
+    property  :updated_at, DateTime
 
     belongs_to  :tile_template
     belongs_to  :card
     is :list, :scope => :card_id
-	end
+  end
 
   class Card
-		include DataMapper::Resource
+    include DataMapper::Resource
     property    :id, Serial
-		property		:created_at, DateTime
+    property    :created_at, DateTime
 
     belongs_to  :player
     has n,      :tiles  # always 25 for a 5 x 5 card
@@ -135,10 +139,10 @@ module BusBingo
     end
   end
 
-	class Player
-		include DataMapper::Resource
-		property	:id, String, :key => true # OpenID URL
-		property	:email, String
+  class Player
+    include DataMapper::Resource
+    property  :id, String, :key => true # OpenID URL
+    property  :email, String
 
     has 1,    :card
     has 1,    :session
@@ -148,8 +152,8 @@ end
 DataMapper.finalize
 
 if localhost? then
-	DataMapper.auto_migrate!  # for testing - will destroy any existing data!
-	load File.dirname(__FILE__) + "/../scripts/insert-tiles.rb"
+  DataMapper.auto_migrate!  # for testing - will destroy any existing data!
+  load File.dirname(__FILE__) + "/../scripts/insert-tiles.rb"
 else
-	DataMapper.auto_upgrade! # for production
+  DataMapper.auto_upgrade! # for production
 end
