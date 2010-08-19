@@ -39,13 +39,16 @@ class Sinatra::Application
     # Creates player if he does not already exist.
     def get_player_with_session(player_id, email)
       digest_id = Digest::SHA1.hexdigest(player_id) 
+      player = BusBingo::Player.get(digest_id)
       
-      if (player = BusBingo::Player.get(digest_id)).nil? then
+      if player.nil? then
         player = BusBingo::Player.create(:id => digest_id, :email => email)
+        STDERR.puts player.pretty_inspect # TODO
         player.card = BusBingo::Card.new
       end
-      player.session = BusBingo::Session.new(:ip => request.ip)
-      player.save
+      player.session = BusBingo::Session.new(:ip => request.ip) \
+        if !player.session
+      player.save # TODO - excpetion thrown here!
 			logger.debug("create_player_with_session: player:")
 			logger.debug player.pretty_inspect
       return player
@@ -227,6 +230,11 @@ class Sinatra::Application
     #Rack::Mime.mime_type('text/plain', nil); # throws exception ?
     set_long_expiration_header
     send_file(path)
+  end
+
+  # Everything else
+  get '/*' do
+    redirect '/play'
   end
 
   # Test that haml works

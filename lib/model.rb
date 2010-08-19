@@ -130,10 +130,10 @@ module BusBingo
     belongs_to  :player
 
     def initialize(attrs)
-      ip = attrs[:ip]
-      # Destroy previous sessions for same player and ip
-      #self.class.all({:player => player}).each {|s| s.destroy}
+      # Destroy previous sessions for same ip
       self.class.all({:ip => ip}).each {|s| s.destroy}
+
+      ip = attrs[:ip]
       self.id = Digest::SHA1.hexdigest(ip + Time.now.to_s)
       super attrs
     end
