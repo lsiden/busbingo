@@ -79,20 +79,20 @@ class Sinatra::Application
   ###############
   # Index page and login
   get '/' do
-    redirect get_session ? '/play' : '/login'
+    redirect get_session ? '/play' : '/sign-in'
   end
 
-  get '/login' do
+  get '/sign-in' do
 		# URL that rpxnow.com will post to after authenticating user credentials
 		domain = localhost? ? 'localhost:9292' : 'busbingo.heroku.com'
 		@token_url = uri_encode("http://#{domain}/sessions")
-		haml :login
+		haml :sign_in
   end
 
   get '/logout' do
     session = get_session or redirect "/"
     session.destroy
-    redirect '/login'
+    redirect '/sign-in'
   end
 
   # Create new session for authenticated player.
@@ -117,11 +117,11 @@ class Sinatra::Application
     elsif err = auth_response['err'] then
       #throw :halt, [403, "Login failed; RPX auth_response #{err['code']}: #{err['msg']}"]
       logger.error "Login failed; RPX auth_response #{err['code']}: #{err['msg']}"
-			redirect "/login"
+			redirect "/sign-in"
     else
       #throw :halt, [500, "Login failed; #{auth_response.pretty_inspect}"]
       logger.error "Login failed; #{auth_response.pretty_inspect}"
-			redirect "/login"
+			redirect "/sign-in"
     end
   end
 

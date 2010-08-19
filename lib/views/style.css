@@ -59,23 +59,25 @@ background-color: #CCC;
 }
 */
 
-#login #sign-in {
+#login #content {
   top: 2cm;
   left: 8cm;
   font-size: xx-large;
-  text-align: center;
-  margin-top: 1.5cm;
+  margin-top: 0.5cm;
+  margin-left: 1cm;
 }
 
 #login #photo {
   top: 6cm;
   left: 4cm;
-  text-align: center;
-  margin-top: 1.5cm;
+}
+
+#login #photo img {
+  height: 8cm;
 }
 
 #copyright {
-  margin: 0.75cm 3cm;
+  margin: 0.75cm 1cm;
 }
 
 #menu {
