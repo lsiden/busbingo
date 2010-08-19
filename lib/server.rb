@@ -43,14 +43,11 @@ class Sinatra::Application
       
       if player.nil? then
         player = BusBingo::Player.create(:id => digest_id, :email => email)
-        STDERR.puts player.pretty_inspect # TODO
         player.card = BusBingo::Card.new
       end
       player.session = BusBingo::Session.new(:ip => request.ip) \
         if !player.session
-      player.save # TODO - excpetion thrown here!
-			logger.debug("create_player_with_session: player:")
-			logger.debug player.pretty_inspect
+      player.save
       return player
     end
 
