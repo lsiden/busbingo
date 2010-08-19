@@ -120,7 +120,9 @@ class Sinatra::Application
   end
 
   ###############
-  # Tiles
+  # Tile management
+
+=begin
 
   # Render edit form
   get '/tiles/new' do
@@ -142,19 +144,23 @@ class Sinatra::Application
     'Work in progress'
   end
 
-  ###############
-  # Mock page
-
-  # Render page with game card.
-  # TODO - Replace this with '/card' or '/', id is in session
   get '/count-tiles' do
     BusBingo::TileTemplate.count.to_s
   end
+
+=end
+
+  ###############
+  # Mock page
+
+=begin
 
   get '/mockup' do
     #FileUtils.pwd
     send_file('lib/views/mock.html')
   end
+
+=end
 
   ###############
   # Games
