@@ -90,7 +90,6 @@ module BusBingo
       BusBingo::TileTemplate.count > 0 \
         or raise "Cannot create new card; there are no tiles defined"
 
-      super
       all_templates = BusBingo::TileTemplate.all #(:enabled => true) # does not work in SqlLite
       selected_templates = []
 
@@ -99,6 +98,7 @@ module BusBingo
         selected_templates += Permutation.for(all_templates).random!.project(all_templates)
       end
       self.tiles = selected_templates[0, N_TILES].map {|tt| BusBingo::Tile.new(:tile_template => tt)}
+      super
     end
 
     protected

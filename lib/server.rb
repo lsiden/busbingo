@@ -39,7 +39,8 @@ class Sinatra::Application
     # Creates player if he does not already exist.
     def get_player_with_session(player_id, email)
       digest_id = Digest::SHA1.hexdigest(player_id) 
-      player = BusBingo::Player.get(digest_id) or begin
+      
+      if (player = BusBingo::Player.get(digest_id)).nil? then
         player = BusBingo::Player.create(:id => digest_id, :email => email)
         player.card = BusBingo::Card.new
       end
