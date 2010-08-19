@@ -89,6 +89,12 @@ class Sinatra::Application
 		haml :login
   end
 
+  get '/logout' do
+    session = get_session or redirect "/"
+    session.destroy
+    redirect '/login'
+  end
+
   # Create new session for authenticated player.
   post '/sessions' do
     logger.debug "token=#{params[:token]}"
