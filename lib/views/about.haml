@@ -6,12 +6,9 @@
 
   %body#about
 
-    #menu
-      %ul
-        %li
-          %a(href='/privacy' title="Our privacy policy") Privacy
-        %li
-          %a(href='/play' title="Play BusBingo!") Play
+    #right-sidebar
+      #menu= @menu.render(:privacy, :play)
+      #follow= @follow
 
     #page-header
       %img#girl(src="/views/images/girl-with-bingo.jpg")

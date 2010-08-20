@@ -5,16 +5,15 @@
   %head= html_head(:title => 'BusBingo - Privacy')
 
   %body#privacy
-    #menu
-      %ul
-        %li
-          %a(href='/about' title="About BusBingo") About
-        %li
-          %a(href='/play' title="Play BusBingo!") Play
+    #right-sidebar
+      #menu= @menu.render(:about, :play)
+      #follow= @follow
 
     #page-header
       %img#girl(src="/views/images/girl-with-bingo.jpg")
       %h1 Privacy
+
     #content
     :markdown
-      BusBingo collects only players' e-mail addresses and their game responses.  E-mail addresses will not be published or shared.
+      BusBingo collects only players' e-mail addresses and their game responses.
+      E-mail addresses will not be published or shared.

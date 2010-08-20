@@ -6,18 +6,9 @@
 
   %body#card
     -# = pp @card
-    %hidden#card-id{:value => "#{@card.id}"}
-
-    #menu
-      %ul
-        %li
-          %a(href='/about' title="About BusBingo") About
-        %li
-          %a(href='/privacy' title="Our privacy policy") Privacy
-        %li
-          %a(href='#' onclick="window.print(); return false;" title="Print your card") Print
-        %li
-          %a(href='/logout' title="End session (for shared computers)") Logout
+    #right-sidebar
+      #menu= @menu.render(:about, :privacy, :print, :logout)
+      #follow= @follow
 
     #page-header
       %h1
@@ -45,3 +36,5 @@
               %img{:src => "/views/images/checkmark.png", :title => tt.desc, :alt => tt.name }
           - i += 1
     %div#copyright= @copyright
+    %hidden#card-id{:value => "#{@card.id}"}
+

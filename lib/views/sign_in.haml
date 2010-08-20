@@ -5,12 +5,9 @@
   %head= html_head(:title => 'BusBingo - Sign In')
 
   %body#login
-    #menu
-      %ul
-        %li
-          %a(href='/about' title="About BusBingo") About
-        %li
-          %a(href='/privacy' title="Our privacy policy") Privacy
+    #right-sidebar
+      #menu= @menu.render(:about, :privacy)
+      #follow= @follow
 
     #content
       #photo
