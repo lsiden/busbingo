@@ -44,6 +44,10 @@ div.cell.picture:hover {
   opacity: .85;
 }
 
+body#card {
+  width: 20cm;
+}
+
 #card #you-have-bingo {
   display: none;
 }
