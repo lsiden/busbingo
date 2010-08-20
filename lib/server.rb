@@ -134,7 +134,7 @@ class Sinatra::Application
     logger.debug request.path
     #logger.debug request.pretty_inspect
 
-    if request.path =~ /^\/blackberry/ \
+    if request.path !~ /^\/blackberry/ \
       && request.env['HTTP_USER_AGENT'] =~ /blackberry/i then
 
       redirect '/blackberry'
