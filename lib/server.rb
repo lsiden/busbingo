@@ -268,7 +268,7 @@ class Sinatra::Application
   get '/play' do
     session = get_session or redirect "/"
 		@card = session.player.card # Make card accessable to HAML
-    haml :card
+    haml :play
   end
 
   # TODO - Requires admin session.

@@ -44,15 +44,16 @@ div.cell.picture:hover {
   opacity: .85;
 }
 
-body#card {
-  width: 20cm;
+body#play #page {
+  position: relative;
+  min-width: 20cm;
 }
 
-#card #you-have-bingo {
+#you-have-bingo {
   display: none;
 }
 
-#card #you-have-bingo.on {
+#you-have-bingo.on {
   display: inline;
   color: green;
 }
@@ -84,9 +85,16 @@ background-color: #CCC;
   margin: 0.75cm 1cm;
 }
 
+#play #right-sidebar {
+  position: absolute;
+  top: .5cm;
+  left: 21cm;
+}
+
 #right-sidebar {
   float: right;
-  margin-right: 1cm;
+  margin-top: .5cm;
+  margin-right: .5cm;
 }
 
 #page-header {
@@ -105,7 +113,7 @@ background-color: #CCC;
   left: 4.5cm;
 }
 
-#card #page-header h1 {
+#play #page-header h1 {
   position: relative;
   left: 0;
 }
