@@ -73,12 +73,11 @@ background-color: #CCC;
 }
 
 #login #photo {
-  top: 6cm;
-  left: 4cm;
+  margin-left: 1cm;
 }
 
 #login #photo img {
-  height: 8cm;
+  height: 6cm;
 }
 
 #copyright {
