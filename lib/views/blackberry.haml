@@ -1,0 +1,34 @@
+!!! Strict
+/ Copyright 2010, Westside Consulting LLC, Ann Arbor, MI, USA
+
+%html{html_attrs}
+  %head
+    %title Bus Bingo
+    %link(rel = "Stylesheet" href = "/views/style.css" type = "text/style")
+
+  %body#login
+    #menu
+      %ul
+        %li
+          %a(href='/about' title="About Bus Bingo") About
+        %li
+          %a(href='/privacy' title="Our privacy policy") Privacy
+
+    #content
+      #photo
+        %img(src= "/views/images/girl-with-bingo.jpg")
+
+      :markdown
+        Oh poop!
+        ========
+
+        You have a Blackberry! :(  
+        
+        Our login component, [Janrain Engage](http://janrain.com), is not compatible with Blackberrys.  
+        
+        We treasure your participation in BusBingo and [getdowntown.org](http://getdowntown.org), 
+        and hope you will try again from your home or work.
+
+        \--Nancy Shore, Director, [getdowntown.org](http://getdowntown.org)
+
+    %div#copyright= @copyright

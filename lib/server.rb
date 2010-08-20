@@ -17,8 +17,8 @@ require 'maruku'
 class Sinatra::Application
 
   # some configuration
-  #enable :dump_errors, :logging
-  disable :logging
+  disable :dump_errors
+  enable :logging
 
   helpers do
     include BusBingo::Helpers
@@ -69,6 +69,14 @@ class Sinatra::Application
 
   before do
     @copyright = 'Copyright&copy; 2010, Lawrence Siden, <a href="http://westside-consulting.com/">Westside Consulting LLC</a>, Ann Arbor, MI, USA'
+    logger.debug request.path
+    #logger.debug request.pretty_inspect
+
+    if request.path != '/blackberry' \
+      && request.env['HTTP_USER_AGENT'] =~ /blackberry/i then
+
+      redirect '/blackberry'
+    end
   end 
 
   # Over-ride obnoxious "Sinatra doesn't know this ditty..." page.
@@ -123,6 +131,10 @@ class Sinatra::Application
       logger.error "Login failed; #{auth_response.pretty_inspect}"
 			redirect "/sign-in"
     end
+  end
+
+  get '/blackberry' do
+    haml :blackberry
   end
 
   ###############
