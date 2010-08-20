@@ -2,15 +2,7 @@
 / Copyright 2010, Westside Consulting LLC, Ann Arbor, MI, USA
 
 %html{html_attrs}
-  :plain
-    <head>
-      <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
-      <meta http-equiv="content-script-type" content="text/javascript" />
-      <title>BusBingo</title>
-      <script type="text/javascript" src="/views/jquery-1.4.2.min.js"></script>
-      <script type="text/javascript" src="/views/script.js"></script>
-      <link rel="stylesheet" href="/views/style.css" type="text/css" media="all" />
-    </head>
+  %head= html_head(:title => 'BusBingo - Play!')
 
   %body#card
     -# = pp @card

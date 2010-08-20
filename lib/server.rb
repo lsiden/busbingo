@@ -65,10 +65,28 @@ class Sinatra::Application
 			logger.debug session.pretty_inspect
       return session
     end
+
+    def html_head(attrs)
+      @html_head = <<-XXX
+      <head>
+        <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
+        <meta http-equiv="content-script-type" content="text/javascript" />
+        <title>#{attrs[:title]}</title>
+        <script type="text/javascript" src="/views/jquery-1.4.2.min.js"></script>
+        <script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+        <script type="text/javascript" src="/views/script.js"></script>
+        <link rel="stylesheet" href="/views/style.css" type="text/css" media="all" />
+      </head>
+      XXX
+    end
+
   end
 
   before do
     @copyright = 'Copyright&copy; 2010, Lawrence Siden, <a href="http://westside-consulting.com/">Westside Consulting LLC</a>, Ann Arbor, MI, USA'
+    @follow = <<-XXX
+      <a href="http://twitter.com/share" class="twitter-share-button" data-count="none" data-via="getdowntown">Tweet</a>
+    XXX
     logger.debug request.path
     #logger.debug request.pretty_inspect
 
