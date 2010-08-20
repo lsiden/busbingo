@@ -72,7 +72,7 @@ class Sinatra::Application
     logger.debug request.path
     #logger.debug request.pretty_inspect
 
-    if request.path != '/blackberry' \
+    if request.path =~ /^\/blackberry/ \
       && request.env['HTTP_USER_AGENT'] =~ /blackberry/i then
 
       redirect '/blackberry'
@@ -135,6 +135,14 @@ class Sinatra::Application
 
   get '/blackberry' do
     haml :blackberry
+  end
+
+  get '/blackberry/dakota' do
+    haml 'blackberry-dakota'
+  end
+
+  get '/blackberry' do
+    haml 'blackberry-baby'
   end
 
   ###############
