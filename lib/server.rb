@@ -316,9 +316,6 @@ class Sinatra::Application
     path = File.join('lib/views', *path)
     path = File.join(path, 'index.html') if File.directory?(path)
     #logger.debug(path)
-
-    # send actual file
-    #Rack::Mime.mime_type('text/plain', nil); # throws exception ?
     set_long_expiration_header
     send_file(path)
   end
