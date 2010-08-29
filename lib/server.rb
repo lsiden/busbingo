@@ -311,12 +311,10 @@ class Sinatra::Application
   end
 
   get '/views/*' do
-    # Get file path.  if refers to a directory, try index.html
     path = params[:splat].first.split('/')
     path = File.join('lib/views', *path)
     path = File.join(path, 'index.html') if File.directory?(path)
     #logger.debug(path)
-    set_long_expiration_header
     send_file(path)
   end
 
