@@ -116,3 +116,11 @@ background-color: #CCC;
   position: relative;
   left: 0;
 }
+
+#blackberry {
+  font-size: small;
+}
+
+#blackberry #photo img {
+  height: 3cm;
+}
