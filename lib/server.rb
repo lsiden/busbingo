@@ -83,14 +83,15 @@ class Sinatra::Application
     class Menu
       attr_reader :items
      
-      def initialize
+      def initialize(env)
        @items = {
-        :about => {:href => '/about', :onclick => 'return true;', :title => "About BusBingo", :content => 'About'},
-        :privacy => {:href => '/privacy', :onclick => 'return true;', :title => "Our privacy policy", :content => 'Privacy'},
-        :play => {:href => '/play', :onclick => 'return true;', :title => "Play BusBingo!", :content => 'Play!'},
-        :print => {:href => '#', :onclick => 'window.print(); return false;', :title => "Print this page", :content => 'Print'},
-        :logout => {:href => '/logout', :onclick => 'return true;', :title => "Log out of Bus Bingo", :content => 'Logout'},
+        :about => {:href => '/about', :title => "About BusBingo", :content => 'About'},
+        :privacy => {:href => '/privacy', :title => "Our privacy policy", :content => 'Privacy'},
+        :play => {:href => '/play', :title => "Play BusBingo!", :content => 'Play!'},
+        :print => {:href => 'javascript: window.print();', :title => "Print this page", :content => 'Print'},
+        :logout => {:href => '/logout', :title => "Log out of Bus Bingo", :content => 'Logout'},
         }
+        @env = env
       end
 
       # === Parameters
@@ -98,19 +99,28 @@ class Sinatra::Application
       # === Example
       #   render(:about, :privacy)
       def render(*items)
-        s = "<ul>\n"
-        items.each do |sym|
-          item = @items[sym]
-          s += %Q(<li><a href="#{item[:href]}" onclick="#{item[:onclick]}" title="#{item[:title]}">#{item[:content]}</a></li>\n)
+        if @env['HTTP_USER_AGENT'] =~ /iPhone/i then
+          s = "<select onchange='window.location = this.value'>\n<option>Go to</option>\n"
+          items.each do |sym|
+            item = @items[sym]
+            s += %Q(<option value="#{item[:href]}">#{item[:content]}</option>\n)
+          end
+          s += "</select>\n"
+        else
+          s = "<ul>\n"
+          items.each do |sym|
+            item = @items[sym]
+            s += %Q(<li><a href="#{item[:href]}" title="#{item[:title]}">#{item[:content]}</a></li>\n)
+          end
+          s += "</ul>\n"
         end
-        s += "</ul>\n"
         return s
       end
     end
   end
 
   before do
-    @menu = Menu.new
+    @menu = Menu.new(env)
     @copyright = 'Copyright&copy; 2010, Lawrence Siden, <a href="http://westside-consulting.com/">Westside Consulting LLC</a>, Ann Arbor, MI, USA'
     @follow = <<-XXX
       <div><a href="http://twitter.com/share" class="twitter-share-button" data-count="none" data-via="getdowntown">Tweet</a></div>
