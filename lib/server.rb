@@ -146,11 +146,8 @@ class Sinatra::Application
     logger.debug request.path
     #logger.debug request.pretty_inspect
 
-    if request.path !~ /^\/blackberry/ \
-      && request.env['HTTP_USER_AGENT'] =~ /blackberry/i then
-
-      redirect '/blackberry'
-    end
+    redirect '/blackberry' \
+      if request.env['HTTP_USER_AGENT'] =~ /blackberry/i && request.path =~ /^\/sign-in/
   end 
 
   # Over-ride obnoxious "Sinatra doesn't know this ditty..." page.
