@@ -9,7 +9,7 @@
     #page
 
       #right-sidebar
-        #menu= @menu.render(:how_to_play, :legend, :about, :privacy, :print, :logout)
+        #menu= @menu.render(:how_to_play, :legend, :about, :privacy, :print, )
         #follow= @follow
 
       #page-header
@@ -17,12 +17,6 @@
           BusBingo 
           %span#you-have-bingo{:class => @card.has_bingo? && "on"}
             %span#you-have-bingo-inside - You have Bingo!
-
-        #instructions
-          :markdown
-            - Hold your mouse over each square for an explanation of its meaning.
-            - Click on squares that match your experiences while commuting today.
-            - When you have bingo, you will be entered in a drawing.
 
       %div#bingo-card
         - i = 0

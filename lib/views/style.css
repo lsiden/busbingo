@@ -6,6 +6,11 @@
   width: 20cm;
 }
 
+#play #page-header {
+  position: relative;
+  height: 2.0cm;
+}
+
 #bingo-card .cell {
   position: absolute;
 }
