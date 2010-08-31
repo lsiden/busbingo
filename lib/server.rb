@@ -60,7 +60,7 @@ class Sinatra::Application
       return nil unless session_id
 
       session = BusBingo::Session.get(session_id)
-      session.save if session # reset :updated_at on session to note login
+      session.save if session # reset :updated_at on session to prevent it from being deleted by cron
       logger.debug "get_session: session:"
 			logger.debug session.pretty_inspect
       return session
