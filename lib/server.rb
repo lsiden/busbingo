@@ -85,11 +85,13 @@ class Sinatra::Application
      
       def initialize(env)
        @items = {
-        :about => {:href => '/about', :title => "About BusBingo", :content => 'About'},
-        :privacy => {:href => '/privacy', :title => "Our privacy policy", :content => 'Privacy'},
-        :play => {:href => '/play', :title => "Play BusBingo!", :content => 'Play!'},
-        :print => {:href => 'javascript: window.print();', :title => "Print this page", :content => 'Print'},
-        :logout => {:href => '/logout', :title => "Log out of Bus Bingo", :content => 'Logout'},
+        :about    => {:href => '/about', :content => 'About'},
+        :privacy  => {:href => '/privacy', :content => 'Privacy'},
+        :play     => {:href => '/play', :content => 'Play!'},
+        :print    => {:href => 'javascript: window.print();', :content => 'Print'},
+        :logout   => {:href => '/logout', :content => 'Logout'},
+        :how_to_play => {:href => '/how-to-play', :content => 'How to Play'},
+        :legend   => {:href => '/legend', :content => 'Legend'},
         }
         @env = env
       end
@@ -110,7 +112,7 @@ class Sinatra::Application
           s = "<ul>\n"
           items.each do |sym|
             item = @items[sym]
-            s += %Q(<li><a href="#{item[:href]}" title="#{item[:title]}">#{item[:content]}</a></li>\n)
+            s += %Q(<li><a href="#{item[:href]}">#{item[:content]}</a></li>\n)
           end
           s += "</ul>\n"
         end
@@ -164,7 +166,7 @@ class Sinatra::Application
 
   get '/sign-in' do
 		# URL that rpxnow.com will post to after authenticating user credentials
-		domain = localhost? ? 'localhost:9292' : 'busbingo.heroku.com'
+		domain = localhost? ? 'localhost:9292' : 'busbingo.getdowntown.org'
 		@token_url = uri_encode("http://#{domain}/sessions")
 		haml :sign_in
   end
@@ -207,14 +209,6 @@ class Sinatra::Application
 
   get '/blackberry' do
     haml :blackberry
-  end
-
-  get '/blackberry/dakota' do
-    haml 'blackberry-dakota'
-  end
-
-  get '/blackberry' do
-    haml 'blackberry-baby'
   end
 
   ###############
@@ -318,6 +312,15 @@ class Sinatra::Application
 
   get '/privacy' do
     haml :privacy
+  end
+
+  get '/how-to-play' do
+    haml :how_to_play
+  end
+
+  get '/legend' do
+    @tile_templates = BusBingo::TileTemplate.all
+    haml :legend
   end
 
   get '/views/*' do

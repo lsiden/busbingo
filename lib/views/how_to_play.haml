@@ -1,0 +1,29 @@
+!!! Strict
+/ Copyright 2010, Westside Consulting LLC, Ann Arbor, MI, USA
+
+%html{html_attrs}
+  =html_head(:title => 'BusBingo - How to Play')
+
+  %body#how_to_play
+
+    #right-sidebar
+      #menu= @menu.render(:about, :privacy, :play)
+      #follow= @follow
+
+    #page-header
+      %img#girl(src="/views/images/girl-with-bingo.jpg")
+      %h1 How to Play
+
+    #content
+      :markdown
+        - On a PC, hover your mouse over each square for an explanation.
+        - On a smart-phone, go to the [Legend](/legend) page for an explanation of icons.
+        - Click on the squares that match your experiences today.
+        - Once you have marked 5 squares across, diagonal, or down, you will have Bingo
+          and will be automatically entered into a drawing for a $5 coffee card.
+        - You can always click on *Free* squares.
+        - Come back to BusBingo at anytime by signing in.
+        - You can only win once.
+        - To play with paper and pen, click the *Print* link for a printable view of your bingo card.  Print and bring it in to [getDowntown](http://getdowntown.org/about/) when you are done or fill it out on your PC.
+
+    =@facebook_sdk

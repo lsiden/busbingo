@@ -3,6 +3,7 @@
 #bingo-card {
   position: relative;
   height: 20cm;
+  width: 20cm;
 }
 
 #bingo-card .cell {
@@ -123,4 +124,23 @@ background-color: #CCC;
 
 #blackberry #photo img {
   height: 3cm;
+}
+
+#content {
+  max-width: 15cm;
+}
+
+#legend #content ul {
+  list-style-type: none;
+  position: relative;
+  left: -2em;
+}
+
+#legend #content li img {
+  height: 1cm;
+}
+
+#legend #content li .desc {
+  position: relative;
+  top: -0.33cm;
 }

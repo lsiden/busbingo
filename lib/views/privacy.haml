@@ -5,6 +5,7 @@
   =html_head(:title => 'BusBingo - Privacy')
 
   %body#privacy
+
     #right-sidebar
       #menu= @menu.render(:about, :play)
       #follow= @follow
@@ -14,8 +15,8 @@
       %h1 Privacy
 
     #content
-    :markdown
-      BusBingo collects only players' e-mail addresses and their game responses.
-      E-mail addresses will not be published or shared.
+      :markdown
+        BusBingo collects only players' e-mail addresses and their game responses.
+        E-mail addresses will not be published or shared.
 
     =@facebook_sdk
