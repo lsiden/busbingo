@@ -149,3 +149,14 @@ background-color: #CCC;
   position: relative;
   top: -0.33cm;
 }
+
+#about_me #content label {
+  display: block;
+  margin: 1em 0;
+  position: relative;
+}
+
+#about_me #content input {
+  position: absolute;
+  left: 5.5em;
+}

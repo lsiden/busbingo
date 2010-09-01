@@ -17,7 +17,7 @@ module BusBingo
 
     # Returns true iff app is running on a know local host.
     def localhost?
-      %w(morpheus lsiden-laptop).to_set.include?(Socket.gethostname)
+      %w(morpheus lsiden-laptop lsiden-laptop2).to_set.include?(Socket.gethostname)
     end
 
     def uri_encode(s)

@@ -1,0 +1,32 @@
+!!! Strict
+/ Copyright 2010, Westside Consulting LLC, Ann Arbor, MI, USA
+
+%html{html_attrs}
+  =html_head(:title => 'BusBingo - About Me')
+
+  %body#about_me
+
+    #right-sidebar
+      #menu= @menu.render(:about, :privacy, :play)
+      #follow= @follow
+
+    #page-header
+      %img#girl(src="/views/images/girl-with-bingo.jpg")
+      %h1 About Me
+
+    #content
+      We need the following information so that we can deliver your prize to you.
+      If you don't want to give it to us, that's okay,
+      you can still play; we just won't be able to give you your prize.
+
+      %form(method="POST" action="/about_me")
+        %label
+          E-mail
+          %input{:type => 'text', :name => 'email', :value => @player.email}
+        %label
+          go!Pass
+          %input{:type => 'text', :name => 'gopass', :value => @player.gopass}
+
+        %input{:type => 'submit', :value => 'Submit'}
+
+    =@facebook_sdk
