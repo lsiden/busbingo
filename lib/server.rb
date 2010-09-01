@@ -187,7 +187,7 @@ class Sinatra::Application
 
   post '/about_me' do
     session = get_session or redirect "/"
-    session.player(:email => params[:email], :gopass => params[:gopass]).update
+    session.player.update(:email => params[:email], :gopass => params[:gopass])
     redirect '/play'
   end
 
