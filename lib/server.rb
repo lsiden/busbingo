@@ -90,7 +90,7 @@ class Sinatra::Application
       def initialize(env)
        @items = {
         :about    => {:href => '/about', :content => 'About'},
-        :about_me => {:href => '/about_me', :content => 'About Me'},
+        :about_me => {:href => '/about-me', :content => 'About Me'},
         :privacy  => {:href => '/privacy', :content => 'Privacy'},
         :play     => {:href => '/play', :content => 'Play!'},
         :print    => {:href => 'javascript: window.print();', :content => 'Print'},
@@ -179,13 +179,13 @@ class Sinatra::Application
     redirect '/sign-in'
   end
 
-  get '/about_me' do
+  get '/about-me' do
     session = get_session or redirect "/"
     @player = session.player
     haml :about_me
   end
 
-  post '/about_me' do
+  post '/about-me' do
     session = get_session or redirect "/"
     session.player.update(:email => params[:email], :gopass => params[:gopass])
     redirect '/play'
@@ -213,7 +213,7 @@ class Sinatra::Application
       if player.can_receive_prize?
         redirect '/play'
       else
-        redirect '/about_me'
+        redirect '/about-me'
       end
     elsif err = auth_response['err'] then
       #throw :halt, [403, "Login failed; RPX auth_response #{err['code']}: #{err['msg']}"]

@@ -4,7 +4,7 @@
 %html{html_attrs}
   =html_head(:title => 'BusBingo - About Me')
 
-  %body#about_me
+  %body#about-me
 
     #right-sidebar
       #menu= @menu.render(:about, :privacy, :play)
@@ -19,10 +19,11 @@
       If you don't want to give it to us, that's okay,
       you can still play; we just won't be able to give you your prize.
 
-      %form(method="POST" action="/about_me")
+      %form(method="POST" action="/about-me")
         %label
           E-mail
           %input{:type => 'text', :name => 'email', :value => @player.email}
+
         %label
           go!Pass
           %input{:type => 'text', :name => 'gopass', :value => @player.gopass}

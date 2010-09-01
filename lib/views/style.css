@@ -150,13 +150,13 @@ background-color: #CCC;
   top: -0.33cm;
 }
 
-#about_me #content label {
+#about-me #content label {
   display: block;
   margin: 1em 0;
   position: relative;
 }
 
-#about_me #content input {
+#about-me #content input {
   position: absolute;
   left: 5.5em;
 }
