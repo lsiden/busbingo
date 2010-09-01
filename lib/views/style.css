@@ -160,3 +160,8 @@ background-color: #CCC;
   position: absolute;
   left: 5.5em;
 }
+
+span.free {
+  font-weight: bold;
+  color: green;
+}
