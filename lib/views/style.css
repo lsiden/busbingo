@@ -161,6 +161,10 @@ background-color: #CCC;
   left: 5.5em;
 }
 
+#about-me input#submit {
+  width: 2cm;
+}
+
 span.free {
   font-weight: bold;
   color: green;
