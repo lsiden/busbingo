@@ -25,6 +25,10 @@ class Sinatra::Application
 
     SESSION_COOKIE_NAME = 'x-busbingo-session-id'
 
+    def emmpty(arg)
+      return arg.nil? || arg.length == 0
+    end
+
     def set_long_expiration_header
       # set long expiration headers  
       one_year = 360 * 24 * 60 * 60 # a little less than a year for proxy's-sake
@@ -86,6 +90,7 @@ class Sinatra::Application
       def initialize(env)
        @items = {
         :about    => {:href => '/about', :content => 'About'},
+        :about_me => {:href => '/about-me', :content => 'About Me'},
         :privacy  => {:href => '/privacy', :content => 'Privacy'},
         :play     => {:href => '/play', :content => 'Play!'},
         :print    => {:href => 'javascript: window.print();', :content => 'Print'},
@@ -174,6 +179,18 @@ class Sinatra::Application
     redirect '/sign-in'
   end
 
+  get '/about-me' do
+    session = get_session or redirect "/"
+    @player = session.player
+    haml :about_me
+  end
+
+  post '/about-me' do
+    session = get_session or redirect "/"
+    session.player.update(:email => params[:email], :gopass => params[:gopass])
+    redirect '/play'
+  end
+
   # Create new session for authenticated player.
   post '/sessions' do
     logger.debug "token=#{params[:token]}"
@@ -192,7 +209,12 @@ class Sinatra::Application
       player = get_player_with_session(player_id, email)
       response.set_cookie(SESSION_COOKIE_NAME, {:value => player.session.id, :path => '/'})
       logger.debug "HTTP response=#{self.response.pretty_inspect}"
-      redirect '/play'
+
+      if player.can_receive_prize?
+        redirect '/play'
+      else
+        redirect '/about-me'
+      end
     elsif err = auth_response['err'] then
       #throw :halt, [403, "Login failed; RPX auth_response #{err['code']}: #{err['msg']}"]
       logger.error "Login failed; RPX auth_response #{err['code']}: #{err['msg']}"

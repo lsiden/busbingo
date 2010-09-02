@@ -145,9 +145,18 @@ module BusBingo
     include DataMapper::Resource
     property  :id, String, :key => true # OpenID URL
     property  :email, String
+    property  :gopass, String
 
     has 1,    :card
     has 1,    :session
+
+    def empty(arg)
+      arg.nil? || arg.length == 0
+    end
+
+    def can_receive_prize?
+      !empty(self.email) && !empty(self.gopass)
+    end
   end
 end
 

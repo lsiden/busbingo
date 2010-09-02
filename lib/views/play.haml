@@ -9,7 +9,7 @@
     #page
 
       #right-sidebar
-        #menu= @menu.render(:how_to_play, :legend, :about, :privacy, :print, )
+        #menu= @menu.render(:about_me, :how_to_play, :legend, :about, :privacy, :print, :logout)
         #follow= @follow
 
       #page-header
@@ -17,6 +17,11 @@
           BusBingo 
           %span#you-have-bingo{:class => @card.has_bingo? && "on"}
             %span#you-have-bingo-inside - You have Bingo!
+
+      - if !@card.player.can_receive_prize?
+        :markdown
+          In order for us to deliver your prize to you,
+          you will need to [give us your email and go!pass number](/about-me).
 
       %div#bingo-card
         - i = 0
