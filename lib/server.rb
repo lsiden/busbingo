@@ -89,7 +89,7 @@ class Sinatra::Application
      
       def initialize(env)
        @items = {
-        :about    => {:href => '/about', :content => 'About'},
+        :credits    => {:href => '/credits', :content => 'Credits'},
         :about_me => {:href => '/about-me', :content => 'About Me'},
         :privacy  => {:href => '/privacy', :content => 'Privacy'},
         :play     => {:href => '/play', :content => 'Play!'},
@@ -104,7 +104,7 @@ class Sinatra::Application
       # === Parameters
       # * *items - symbols that indicate which items to include
       # === Example
-      #   render(:about, :privacy)
+      #   render(:credits, :privacy)
       def render(*items)
         if @env['HTTP_USER_AGENT'] =~ /iPhone/i then
           s = "<select onchange='window.location = this.value'>\n<option>Go to</option>\n"
@@ -326,8 +326,8 @@ class Sinatra::Application
     send_file('lib/views/images/favicon.ico');
   end
 
-  get '/about' do
-    haml :about
+  get '/credits' do
+    haml :credits
   end
 
   get '/privacy' do
