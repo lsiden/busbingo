@@ -15,9 +15,10 @@
       %h1 About Me
 
     #content
-      We need the following information so that we can deliver your prize to you.
-      If you don't want to give it to us, that's okay,
-      you can still play; we just won't be able to give you your prize.
+      :markdown
+        We need the following information so that we can deliver your prize to you.
+        If you don't want to give it to us, that's okay,
+        you can still [play](/play); we just won't be able to give you your prize.
 
       %form(method="POST" action="/about-me")
         %label

@@ -96,7 +96,7 @@ class Sinatra::Application
         :print    => {:href => 'javascript: window.print();', :content => 'Print'},
         :logout   => {:href => '/logout', :content => 'Logout'},
         :how_to_play => {:href => '/how-to-play', :content => 'How to Play'},
-        :legend   => {:href => '/legend', :content => 'Legend'},
+        :legend   => {:href => '/legend', :content => 'Key to Images'},
         }
         @env = env
       end
