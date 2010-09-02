@@ -148,8 +148,7 @@ class Sinatra::Application
         }());
       </script>
     XXX
-    logger.debug request.path
-    #logger.debug request.pretty_inspect
+    logger.debug request.pretty_inspect
 
     redirect '/blackberry' \
       if request.env['HTTP_USER_AGENT'] =~ /blackberry/i && request.path =~ /^\/sign-in/
