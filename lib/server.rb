@@ -291,6 +291,7 @@ class Sinatra::Application
   get '/play' do
     session = get_session or redirect "/"
 		@card = session.player.card # Make card accessable to HAML
+    @iPhone = @env['HTTP_USER_AGENT'] =~ /iPhone/i
     haml :play
   end
 
