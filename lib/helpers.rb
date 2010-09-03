@@ -24,5 +24,10 @@ module BusBingo
       # Got this snippet from http://snippets.dzone.com/posts/show/1260
       URI.escape(s, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
     end
+
+    # Return true if request is from an iPhone or Android
+    def smart_phone?
+      @iPhone = @env['HTTP_USER_AGENT'] =~ /iPhone|Android/i
+    end
   end
 end

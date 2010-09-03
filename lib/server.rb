@@ -106,7 +106,7 @@ class Sinatra::Application
       # === Example
       #   render(:credits, :privacy)
       def render(*items)
-        if @env['HTTP_USER_AGENT'] =~ /iPhone/i then
+        if smart_phone? then
           s = "<select onchange='window.location = this.value'>\n<option>Go to</option>\n"
           items.each do |sym|
             item = @items[sym]
@@ -290,7 +290,6 @@ class Sinatra::Application
   get '/play' do
     session = get_session or redirect "/"
 		@card = session.player.card # Make card accessable to HAML
-    @iPhone = @env['HTTP_USER_AGENT'] =~ /iPhone/i
     haml :play
   end
 
