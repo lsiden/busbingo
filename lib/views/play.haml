@@ -1,0 +1,46 @@
+!!! Strict
+/ Copyright 2010, Westside Consulting LLC, Ann Arbor, MI, USA
+
+%html{html_attrs}
+  =html_head(:title => 'BusBingo - Play!')
+
+  %body#play
+
+    #page
+
+      #right-sidebar
+        #menu= @menu.render(:about_me, :how_to_play, :legend, :privacy, :credits, :print, :logout)
+        #follow= @follow
+
+      #page-header
+        %h1
+          BusBingo 
+          %span#you-have-bingo{:class => @card.has_bingo? && "on"}
+            %span#you-have-bingo-inside - You have Bingo!
+
+      - if !@card.player.can_receive_prize?
+        :markdown
+          In order for us to deliver your prize to you,
+          you will need to [give us your email and go!pass number](/about-me).
+
+      - if smart_phone?
+        #key-to-images
+          %a{:href => '/legend'}
+            Key to images
+
+      %div#bingo-card
+        - i = 0
+        - (0..4).each do |row|
+          - (0..4).each do |col|
+            - tile = @card.tiles[i]
+            - tt = tile.tile_template
+            %div{:class => [%w(cell picture), "row#{row}", "col#{col}"]}
+              %a{:href => "#"}
+                %img{:src => "/views/images/#{tt.image_filename}", :title => tt.desc, :alt => tt.name }
+            %div{:class => [%w(cell checkmark), "row#{row}", "col#{col}", tile.covered? && "on"]}
+              %a{:href => "#"}
+                %img{:src => "/views/images/checkmark.png", :title => tt.desc, :alt => tt.name }
+            - i += 1
+      %div#copyright= @copyright
+      %hidden#card-id{:value => "#{@card.id}"}
+      =@facebook_sdk

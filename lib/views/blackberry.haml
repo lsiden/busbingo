@@ -1,0 +1,28 @@
+!!! Strict
+/ Copyright 2010, Westside Consulting LLC, Ann Arbor, MI, USA
+
+%html{html_attrs}
+  =html_head(:title => 'BusBingo - Blackberry')
+
+  %body#blackberry
+    #right-sidebar
+      #menu= @menu.render(:privacy, :credits)
+
+    #content
+      #photo
+        %img(src= "/views/images/baby-with-blackberry.jpg")
+
+      :markdown
+        Oh poop!
+        ========
+
+        You have a BlackBerry! :(  
+        
+        Our login component, [Janrain Engage](http://janrain.com), is not compatible with BlackBerries.
+        
+        We value your participation in BusBingo and [getdowntown.org](http://getdowntown.org), 
+        and hope you will try again from your home or work.
+
+        \--Nancy Shore, Director, [getdowntown.org](http://getdowntown.org)
+
+    %div#copyright= @copyright

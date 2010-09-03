@@ -1,0 +1,18 @@
+!!! Strict
+/ Copyright 2010, Westside Consulting LLC, Ann Arbor, MI, USA
+
+%html{html_attrs}
+  =html_head(:title => 'BusBingo - Sign In')
+
+  %body#login
+    #right-sidebar
+      #menu= @menu.render(:privacy, :credits)
+
+    #content
+      #photo
+        %img(src= "/views/images/girl-with-bingo.jpg")
+
+      :plain
+        <iframe src="http://busbingo.rpxnow.com/openid/embed?token_url=#{@token_url}" scrolling="no" frameBorder="no" allowtransparency="true" style="width:400px;height:240px"></iframe>
+
+    %div#copyright= @copyright

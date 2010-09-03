@@ -1,0 +1,24 @@
+!!! Strict
+/ Copyright 2010, Westside Consulting LLC, Ann Arbor, MI, USA
+
+%html{html_attrs}
+  =html_head(:title => 'BusBingo - Credits')
+
+  %body#credits
+
+    #right-sidebar
+      #menu= @menu.render(:privacy, :play)
+      #follow= @follow
+
+    #page-header
+      %img#girl(src="/views/images/girl-with-bingo.jpg")
+      %h1 Credits
+
+    #content
+      :markdown
+        - Developed by [Lawrence Siden](http://umich.edu/~lsiden), Westside Consulting LLC for getdowntown.org.
+        - Web server written in [Ruby](http://ruby-lang.org) with [Sinatra](http://www.sinatrarb.com) using [Datamapper](http://datamapper.org) and [HAML](http://haml-lang.com).
+        - /game page uses [jQuery](http://jquery.com) for automation.
+        - Images and image titles provided by Nancy Shore of [getdowntown.org](http://getdowntown.org/).
+
+    =@facebook_sdk

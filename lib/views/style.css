@@ -1,0 +1,181 @@
+/* Copyright 2010, Westside Consulting LLC, Ann Arbor, MI, USA */
+
+#bingo-card {
+  position: relative;
+  height: 20cm;
+  width: 20cm;
+}
+
+#play #page-header {
+  position: relative;
+  height: 1.0cm;
+}
+
+#bingo-card .cell {
+  position: absolute;
+}
+
+.cell.row0 { top: 0cm; }
+.cell.row1 { top: 4cm; }
+.cell.row2 { top: 8cm; }
+.cell.row3 { top: 12cm; }
+.cell.row4 { top: 16cm; }
+
+.cell.col0 { left: 0cm; }
+.cell.col1 { left: 4cm; }
+.cell.col2 { left: 8cm; }
+.cell.col3 { left: 12cm; }
+.cell.col4 { left: 16cm; }
+
+.cell img {
+  height: 3cm;
+  width: 3cm;
+  border: solid black 0.1cm;
+  padding: 0.5cm;
+}
+
+div.cell.picture:hover {
+  background-color: red;
+}
+
+.cell.checkmark {
+  display: none;
+}
+
+.cell.checkmark.on {
+  display: block;
+}
+
+.cell.checkmark img {
+  opacity: .85;
+}
+
+body#play #page {
+  position: relative;
+  min-width: 20cm;
+}
+
+#you-have-bingo {
+  display: none;
+}
+
+#you-have-bingo.on {
+  display: inline;
+  color: green;
+}
+
+/*
+a:active {
+background-color: #CCC;
+}
+*/
+
+#login #content {
+  top: 2cm;
+  left: 8cm;
+  font-size: xx-large;
+  margin-top: 0.5cm;
+  margin-left: 1cm;
+}
+
+#login #photo {
+  margin-left: 1cm;
+}
+
+#login #photo img {
+  height: 6cm;
+}
+
+#copyright {
+  margin: 0.75cm 1cm;
+}
+
+#play #right-sidebar {
+  position: absolute;
+  top: .5cm;
+  left: 21cm;
+}
+
+#right-sidebar {
+  float: right;
+  margin-top: .5cm;
+  margin-right: .5cm;
+}
+
+#page-header {
+  position: relative;
+  height: 3.5cm;
+  width: 40em;
+}
+
+#page-header img#girl {
+  position: absolute;
+  height: 3cm;
+}
+
+#page-header h1 {
+  position: absolute;
+  left: 4.5cm;
+}
+
+#play #page-header h1 {
+  position: relative;
+  left: 0;
+}
+
+#blackberry {
+  font-size: small;
+}
+
+#blackberry #photo img {
+  height: 3cm;
+}
+
+#content {
+  max-width: 15cm;
+}
+
+#legend #content ul {
+  list-style-type: none;
+  position: relative;
+  left: -2em;
+}
+
+#legend #content li img {
+  height: 1cm;
+}
+
+#legend #content li .desc {
+  position: relative;
+  top: -0.33cm;
+}
+
+#about-me #content label {
+  display: block;
+  margin: 1em 0;
+  position: relative;
+}
+
+#about-me #content input {
+  position: absolute;
+  left: 5.5em;
+}
+
+#about-me input#submit {
+  width: 2cm;
+}
+
+span.free {
+  font-weight: bold;
+  color: green;
+}
+
+#play #key-to-images {
+  font-size: larger;
+  font-weight: bold;
+  margin-bottom: .5em;
+}
+
+#follow {
+  margin-top: 1.5cm;
+}

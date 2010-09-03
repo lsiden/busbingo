@@ -2,17 +2,7 @@ Feature: Recognizing winning board states
   In order to create a functioning Bingo game
   As a programmer I need to represent board states
   and determine which board states are winners
-
-  @empty
-  Scenario: Empty board
-    Given the following board
-      | . | . | . | . | . |
-      | . | . | . | . | . |
-      | . | . | . | . | . |
-      | . | . | . | . | . |
-      | . | . | . | . | . |
-    Then I count 0 covered squares
-    And I do not have bingo
+  while optimizing the search based on the last tile covered.
 
   Scenario: No bingo
     Given the following board
@@ -21,8 +11,8 @@ Feature: Recognizing winning board states
       | . | x | . | x | . |
       | x | . | x | . | x |
       | . | x | . | x | . |
-    Then I count 12 covered squares
-    And I do not have bingo
+    When the last tile covered was (2, 3)
+    Then I do not have bingo
 
   @row
   Scenario: Covered row
@@ -32,7 +22,7 @@ Feature: Recognizing winning board states
       | . | x | . | x | . |
       | x | . | x | . | x |
       | . | x | . | x | . |
-    Then I count 14 covered squares
+    When the last tile covered was (1, 3)
     And I do have bingo
 
   @column
@@ -43,7 +33,7 @@ Feature: Recognizing winning board states
       | . | x | . | x | . |
       | x | . | x | x | x |
       | . | x | . | x | . |
-    Then I count 14 covered squares
+    When the last tile covered was (1, 3)
     And I do have bingo
 
   @rising
@@ -54,6 +44,7 @@ Feature: Recognizing winning board states
       | . | x | x | x | . |
       | x | x | x | . | x |
       | x | x | . | x | . |
+    When the last tile covered was (1, 3)
     Then I do have bingo
 
   @falling
@@ -64,4 +55,5 @@ Feature: Recognizing winning board states
       | . | x | x | x | . |
       | x | . | x | x | x |
       | . | x | . | x | x |
+    When the last tile covered was (3, 3)
     Then I do have bingo

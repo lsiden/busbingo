@@ -1,0 +1,22 @@
+!!! Strict
+/ Copyright 2010, Westside Consulting LLC, Ann Arbor, MI, USA
+
+%html{html_attrs}
+  =html_head(:title => 'BusBingo - Privacy')
+
+  %body#privacy
+
+    #right-sidebar
+      #menu= @menu.render(:credits, :play)
+      #follow= @follow
+
+    #page-header
+      %img#girl(src="/views/images/girl-with-bingo.jpg")
+      %h1 Privacy
+
+    #content
+      :markdown
+        BusBingo collects only players' e-mail addresses and their game responses.
+        E-mail addresses will not be published or shared.
+
+    =@facebook_sdk

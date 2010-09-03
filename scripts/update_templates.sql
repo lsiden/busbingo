@@ -1,0 +1,16 @@
+PRAGMA foreign_keys=OFF;
+BEGIN TRANSACTION;
+update "bus_bingo_tile_templates" set title='I took a nap.', alt='bed', image_filename='nap.gif', enabled=1 where id=1;
+update "bus_bingo_tile_templates" set title='I saw someone put a bike on the bus.', alt='bicyle', image_filename='bike.gif', enabled=1 where id=2;
+update "bus_bingo_tile_templates" set title='I read a book.', alt='books', image_filename='book.gif', enabled=1 where id=3;
+update "bus_bingo_tile_templates" set title='I went to work.', alt='briefcase', image_filename='work.gif', enabled=1 where id=4;
+update "bus_bingo_tile_templates" set title='I talked on the phone.', alt='cell phone', image_filename='phone.gif', enabled=1 where id=5;
+update "bus_bingo_tile_templates" set title='I went to a bar.', alt='cocktail glass', image_filename='drink.gif', enabled=1 where id=6;
+update "bus_bingo_tile_templates" set title='I listened to music.', alt='earphones', image_filename='Music.gif', enabled=1 where id=7;
+update "bus_bingo_tile_templates" set title='I used e-mail.', alt='envelope', image_filename='email.gif', enabled=1 where id=8;
+update "bus_bingo_tile_templates" set title='I went home.', alt='home', image_filename='home.gif', enabled=1 where id=9;
+update "bus_bingo_tile_templates" set title='I spoke with the bus driver.', alt='man with text bubble', image_filename='busdriver.gif', enabled=1 where id=10;
+update "bus_bingo_tile_templates" set title='I went shopping.', alt='shopping basket', image_filename='shopping.gif', enabled=1 where id=11;
+update "bus_bingo_tile_templates" set title='I used my getDowntown&reg; transit pass.', alt='transit pass', image_filename='go-pass-0910_front.jpg', enabled=1 where id=12;
+update "bus_bingo_tile_templates" set title='I had a conversation.', alt='two businessmen', image_filename='conversation.gif', enabled=1 where id=13;
+COMMIT;

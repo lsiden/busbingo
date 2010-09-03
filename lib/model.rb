@@ -6,12 +6,17 @@ require 'dm-timestamps'
 require 'dm-migrations'
 require 'dm-is-list'
 require 'dm-timestamps'
+require 'dm-validations'
+require 'bingoLogic'
+require 'json'
+require 'digest/sha1'
+require 'helpers'
+require 'permutation'
 #require 'dm-types'
-#require 'dm-validations'
-#require 'json'
 #require 'set'
 #require 'pp'
-#require 'digest/sha1'
+
+include BusBingo::Helpers
 
 DataMapper.setup(:default, ENV['DATABASE_URL'] || 'sqlite3:busbingo.db')
 
@@ -21,55 +26,145 @@ DataMapper::Model.raise_on_save_failure = true
 # http://github.com/datamapper/dm-core/blob/master/lib/dm-core/resource.rb
 module DataMapper
   module Resource
+
+    alias_method :orig_save, :save
+
+    def save(*a)
+      if (!self.valid?) then
+        self.errors.each {|e| logger.warn e}
+        STDERR.puts self.pretty_inspect
+        raise "Cannot save instance of #{self.class.to_s}"
+      end
+      orig_save(*a)
+    end
+
     def assert_save_successful(method, save_retval)
-      if save_retval != true && raise_on_save_failure
-        raise SaveFailureError.new("#{model}##{method}" \
-                                   + "\n#{self.errors.pretty_inspect}" \
-                                   + "\n#{model} was not saved", self.pretty_inspect)
+      if save_retval != true && raise_on_save_failure then
+        self.errors.each {|e| logger.debug e}
+        logger.debug self.pretty_inspect
+        raise SaveFailureError.new("#{model} was not saved", self)
       end
     end
   end
 end
 
 module BusBingo
-	class TileTemplate
-		include DataMapper::Resource
-		property	:id, Serial
-		property	:title, String
-		property	:alt, String
-		property	:image_filename, String		# name of image file without pathname
-		property	:enabled?, Boolean				# whether to include this image in new cards
+  class TileTemplate
+    include DataMapper::Resource
+    property  :name, String, :key => true
+    property  :desc, Text
+    property  :image_filename, String   # name of image file without pathname
+    property  :enabled?, Boolean        # whether to include this image in new cards
+
     has n,    :tiles
-	end
-
-	class Tile
-		include DataMapper::Resource
-		property	:id, Serial
-		property	:covered?, Boolean				# whether this tile on the card is covered
-		property	:updated_at, DateTime
-
-    belongs_to  :tile_template
-    belongs_to  :bingo_card
-    is :list, :scope => :bingo_card_id
-	end
-
-  class BingoCard
-		include DataMapper::Resource
-    property    :id, Serial
-		property		:created_at, DateTimeproperty :updated_at, DateTime
-    belongs_to  :player
-    has n,      :tiles  # always 25 for a 5 x 5 card
   end
 
-	class Player
-		include DataMapper::Resource
-		property	:id, Serial
-		property	:email, String
-	end
+  class Tile
+    include DataMapper::Resource
+    property  :id, Serial
+    property  :covered?, Boolean        # whether this tile on the card is covered
+    property  :updated_at, DateTime
+
+    belongs_to  :tile_template
+    belongs_to  :card
+    is :list, :scope => :card_id
+  end
+
+  class Card
+    include DataMapper::Resource
+    property    :id, Serial
+    property    :created_at, DateTime
+
+    belongs_to  :player
+    has n,      :tiles  # always 25 for a 5 x 5 card
+
+    N_ROWS = 5
+    N_COLS = 5
+    N_TILES = N_ROWS * N_COLS
+
+    def tileAt(row, col)
+      self.tiles[row.to_i * N_COLS + col.to_i]
+    end
+
+    def has_bingo?(row=nil, col=nil)
+      BingoLogic::BingoCard.new(self.rawdata).has_bingo?(row, col)
+    end
+
+    def initialize(*a)
+      BusBingo::TileTemplate.count > 0 \
+        or raise "Cannot create new card; there are no tiles defined"
+
+      all_templates = BusBingo::TileTemplate.all #(:enabled => true) # does not work in SqlLite
+      selected_templates = []
+
+      while selected_templates.length < N_TILES do
+        # Put the tiles in a coffee-can and shake!
+        selected_templates += Permutation.for(all_templates).random!.project(all_templates)
+      end
+      # Now shake the selected ones again!
+      selected_templates = Permutation.for(selected_templates).random!.project(selected_templates)
+      self.tiles = selected_templates[0, N_TILES].map {|tt| BusBingo::Tile.new(:tile_template => tt)}
+      super
+    end
+
+    protected
+
+    def rawdata
+      (0..BusBingo::Card::N_ROWS-1).map do |i|
+        self.rowAt(i).map {|tile| tile.covered?}
+      end
+    end
+
+    # Return an entire row as an array
+    def rowAt(row)
+      self.tiles[row.to_i * N_COLS, N_COLS]
+    end
+ 
+  end
+
+  class Session
+    include DataMapper::Resource
+
+    property    :id, String, :key => true
+    property    :ip, String, :index => true
+    timestamps  :updated_at # for timing-out
+
+    belongs_to  :player
+
+    def initialize(attrs)
+      # Destroy previous sessions for same ip
+      self.class.all({:ip => ip}).each {|s| s.destroy}
+
+      ip = attrs[:ip]
+      self.id = Digest::SHA1.hexdigest(ip + Time.now.to_s)
+      super attrs
+    end
+  end
+
+  class Player
+    include DataMapper::Resource
+    property  :id, String, :key => true # OpenID URL
+    property  :email, String
+    property  :gopass, String
+
+    has 1,    :card
+    has 1,    :session
+
+    def empty(arg)
+      arg.nil? || arg.length == 0
+    end
+
+    def can_receive_prize?
+      !empty(self.email) && !empty(self.gopass)
+    end
+  end
 end
 
 DataMapper.finalize
 
-# TODO
-DataMapper.auto_upgrade! # for production
-#DataMapper.auto_migrate!  # for testing - will destroy any existing data!
+if localhost? then
+  DataMapper.auto_migrate!  # for testing - will destroy any existing data!
+  load File.dirname(__FILE__) + "/../scripts/insert-tiles.rb"
+else
+  DataMapper.auto_upgrade! # for production
+end
