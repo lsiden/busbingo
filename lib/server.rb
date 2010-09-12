@@ -349,6 +349,14 @@ class Sinatra::Application
     send_file(path)
   end
 
+  #################
+  # Admin
+
+  get '/admin/winners' do
+    @winners = BusBingo::Player.select {|p| p.can_receive_prize? && p.card.has_bingo? }
+    haml :winners
+  end
+
   # Everything else
   get '/*' do
     redirect '/play'

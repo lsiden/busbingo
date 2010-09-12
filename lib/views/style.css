@@ -88,6 +88,7 @@ background-color: #CCC;
 
 #copyright {
   margin: 0.75cm 1cm;
+  font-size: smaller;
 }
 
 #play #right-sidebar {
@@ -179,3 +180,31 @@ span.free {
 #follow {
   margin-top: 1.5cm;
 }
+
+#winners #content {
+  margin-top: 1cm;
+  margin-left: 2.5cm;
+}
+
+#winners #list-header {
+  font-weight: bold;
+}
+
+#winners #list {
+  margin-top: .5cm;
+}
+
+#winners .row {
+  position: relative;
+  height: 1em;
+}
+
+#winners .row .email {
+  position: absolute;
+  left: 3.5cm;
+}
+
+#winners .row .gopass {
+  position: absolute;
+}
+
