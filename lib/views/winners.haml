@@ -12,13 +12,13 @@
 
     #content
       #list-header.row
-        %span.email E-mail
         %span.gopass Go!pass
+        %span.email E-mail
 
       #list
         .row
           - @winners.each do |p|
-            %span.email= p.email
             %span.gopass= p.gopass
+            %span.email= p.email
 
     #copyright= @copyright
