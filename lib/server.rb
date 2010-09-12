@@ -10,7 +10,6 @@ require 'pp'
 require 'model'
 require 'haml'
 require 'rest_client'
-require 'digest/sha1'
 require 'maruku'
 #require 'fileutils'
 
@@ -24,6 +23,7 @@ class Sinatra::Application
     include BusBingo::Helpers
 
     SESSION_COOKIE_NAME = 'x-busbingo-session-id'
+    ADMIN_SESSION_ID = '59f219d4c14b40925f43a3b0a001b4e9eb174c41'
 
     def emmpty(arg)
       return arg.nil? || arg.length == 0
@@ -352,12 +352,29 @@ class Sinatra::Application
   #################
   # Admin
 
+  get '/admin/login' do
+    haml :admin_login
+  end
+
+  post '/admin/login' do
+    params[:password] == 't@keth3Bus!' \
+      or redirect '/admin/login?try_again=1'
+
+    response.set_cookie(SESSION_COOKIE_NAME, {:value => ADMIN_SESSION_ID, :path => '/'})
+    redirect '/admin/winners'
+  end
+
   get '/admin/winners' do
+    request.cookies[SESSION_COOKIE_NAME] == ADMIN_SESSION_ID \
+      or redirect '/admin/login'
+
     @winners = BusBingo::Player.select {|p| p.can_receive_prize? && p.card.has_bingo? }
     haml :winners
   end
 
+  #################
   # Everything else
+
   get '/*' do
     redirect '/play'
   end

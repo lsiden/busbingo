@@ -1,0 +1,25 @@
+!!! Strict
+/ Copyright 2010, Westside Consulting LLC, Ann Arbor, MI, USA
+
+%html{html_attrs}
+  =html_head(:title => 'BusBingo - Admin: Login')
+
+  %body#admin-login
+
+    #page-header
+      %img#girl(src="/views/images/girl-with-bingo.jpg")
+      %h1 Admin: Login
+
+    #content
+      - if params[:try_again]
+        #try-again
+          Wrong password.  Try again.
+
+      %form(method="POST" action="/admin/login")
+        %label
+          Admin Password
+          %input{:type => 'password', :name => 'password'}
+
+        %input#submit{:type => 'submit', :value => 'Submit'}
+
+    #copyright= @copyright

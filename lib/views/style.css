@@ -208,3 +208,15 @@ span.free {
   position: absolute;
 }
 
+#admin-login #content {
+  margin-top: 1.0cm;
+  margin-left: 2.5cm;
+}
+
+#admin-login #try-again {
+  color: red;
+}
+
+#admin-login form {
+  margin-top: 0.5cm;
+}
