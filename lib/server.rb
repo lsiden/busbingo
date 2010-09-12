@@ -24,6 +24,7 @@ class Sinatra::Application
 
     SESSION_COOKIE_NAME = 'x-busbingo-session-id'
     ADMIN_SESSION_ID = '59f219d4c14b40925f43a3b0a001b4e9eb174c41'
+    ADMIN_PASSWORD = 't@keth3Bus!'
 
     def emmpty(arg)
       return arg.nil? || arg.length == 0
@@ -357,7 +358,7 @@ class Sinatra::Application
   end
 
   post '/admin/login' do
-    params[:password] == 't@keth3Bus!' \
+    params[:password] == ADMIN_PASSWORD \
       or redirect '/admin/login?try_again=1'
 
     response.set_cookie(SESSION_COOKIE_NAME, {:value => ADMIN_SESSION_ID, :path => '/'})
@@ -370,6 +371,14 @@ class Sinatra::Application
 
     @winners = BusBingo::Player.select {|p| p.can_receive_prize? && p.card.has_bingo? }
     haml :winners
+  end
+
+  get '/admin/*' do
+    if request.cookies[SESSION_COOKIE_NAME] == ADMIN_SESSION_ID then
+      redirect '/admin/winners'
+    else
+      redirect '/admin/login/'
+    end
   end
 
   #################
