@@ -26,8 +26,28 @@ class Sinatra::Application
     ADMIN_SESSION_ID = '59f219d4c14b40925f43a3b0a001b4e9eb174c41'
     ADMIN_PASSWORD = 't@keth3Bus!'
 
-    def emmpty(arg)
-      return arg.nil? || arg.length == 0
+    def redirect_lost_player
+      if get_session then
+        redirect '/play'
+      else
+        redirect '/sign-in'
+      end
+    end
+
+    def redirect_lost_admin
+      if request.cookies[SESSION_COOKIE_NAME] == ADMIN_SESSION_ID then
+        redirect '/admin/winners'
+      else
+        redirect '/admin/login'
+      end
+    end 
+
+    def display_winners
+      request.cookies[SESSION_COOKIE_NAME] == ADMIN_SESSION_ID \
+        or redirect '/admin/login'
+
+      @winners = BusBingo::Player.select {|p| p.can_receive_prize? && p.card.has_bingo? }
+      haml :winners
     end
 
     def set_long_expiration_header
@@ -59,15 +79,13 @@ class Sinatra::Application
     # This session is different from env[rack.session].
     # It's maintained in the model.
     def get_session
-      # Insure that caller has a session.
-      session_id = request.cookies[SESSION_COOKIE_NAME]
-      logger.debug "#{request.path}: session_id=#{session_id}"
-      return nil unless session_id
+      session_id = request.cookies[SESSION_COOKIE_NAME] \
+        or return nil
 
-      session = BusBingo::Session.get(session_id)
+      session = BusBingo::Session.get(session_id) \
+        or return nil # timed out
+
       session.save if session # reset :updated_at on session to prevent it from being deleted by cron
-      logger.debug "get_session: session:"
-			logger.debug session.pretty_inspect
       return session
     end
 
@@ -161,32 +179,38 @@ class Sinatra::Application
   end
 
   ###############
-  # Index page and login
-  get '/' do
-    redirect get_session ? '/play' : '/sign-in'
-  end
+  # Sign in
 
   get '/sign-in' do
-		# URL that rpxnow.com will post to after authenticating user credentials
-		domain = localhost? ? 'localhost:9292' : 'busbingo.getdowntown.org'
-		@token_url = uri_encode("http://#{domain}/sessions")
-		haml :sign_in
+    redirect '/play' \
+      if get_session
+
+    # URL that rpxnow.com will post to after authenticating user credentials
+    domain = localhost? ? 'localhost:9292' : 'busbingo.getdowntown.org'
+
+    @token_url = uri_encode("http://#{domain}/sessions")
+    haml :sign_in
   end
 
   get '/logout' do
-    session = get_session or redirect "/"
-    session.destroy
+    if session = get_session then
+      session.destroy
+    end
     redirect '/sign-in'
   end
 
   get '/about-me' do
-    session = get_session or redirect "/"
+    session = get_session \
+      or redirect '/sign-in'
+
     @player = session.player
     haml :about_me
   end
 
   post '/about-me' do
-    session = get_session or redirect "/"
+    session = get_session \
+      or redirect '/sign-in'
+
     session.player.update(:email => params[:email], :gopass => params[:gopass])
     redirect '/play'
   end
@@ -201,6 +225,7 @@ class Sinatra::Application
     auth_response = JSON.parse(json)
     logger.debug "post /sessions: auth_response:"
 		logger.debug auth_response.pretty_inspect
+		logger.debug "auth_response['stat']=#{auth_response['stat']}"
 
     if auth_response['stat'] == 'ok' then
       profile = auth_response['profile']
@@ -209,31 +234,24 @@ class Sinatra::Application
       player = get_player_with_session(player_id, email)
       response.set_cookie(SESSION_COOKIE_NAME, {:value => player.session.id, :path => '/'})
       logger.debug "HTTP response=#{self.response.pretty_inspect}"
-
-      if player.can_receive_prize?
-        redirect '/play'
-      else
-        redirect '/about-me'
-      end
+      redirect player.can_receive_prize? ? '/play' : '/about-me'
     elsif err = auth_response['err'] then
       #throw :halt, [403, "Login failed; RPX auth_response #{err['code']}: #{err['msg']}"]
       logger.error "Login failed; RPX auth_response #{err['code']}: #{err['msg']}"
-			redirect "/sign-in"
     else
       #throw :halt, [500, "Login failed; #{auth_response.pretty_inspect}"]
       logger.error "Login failed; #{auth_response.pretty_inspect}"
-			redirect "/sign-in"
     end
+    redirect '/sign-in'
   end
 
   get '/blackberry' do
     haml :blackberry
   end
 
+=begin
   ###############
   # Tile management
-
-=begin
 
   # Render edit form
   get '/tiles/new' do
@@ -276,35 +294,20 @@ class Sinatra::Application
   ###############
   # Games
 
-  # Create a new card.
-=begin
-  post '/cards' do
-    session = get_session or redirect "/"
-    card = session.player.new_card
-    redirect "http://#{request.host}:#{request.port}/play"
-  end
-=end
-
   # Render page with card card.
-  # TODO - Replace this with '/card' or '/', id is in session
-  #get '/cards/:id' do
   get '/play' do
-    session = get_session or redirect "/"
+    session = get_session \
+      or redirect '/sign-in'
 		@card = session.player.card # Make card accessable to HAML
     haml :play
-  end
-
-  # TODO - Requires admin session.
-  # Render list of cards and their outcomes.
-  get '/cards' do
-    'Work in progress'
   end
 
   # For card :id, set <row, col> to state {0 = uncovered, anything else is covered}.
   # Returns header with x-busbingo-has-bingo that matches /'[x ]{nTiles}'(, winner)?/
   put '/cards/:id' do
     #puts(params)
-    session = get_session or redirect "/"
+    session = get_session \
+      or redirect '/sign-in'
 		card = session.player.card
 		logger.debug "put #{request.path}: card.id=#{card.id}"
     params[:id].to_i == card.id \
@@ -354,6 +357,9 @@ class Sinatra::Application
   # Admin
 
   get '/admin/login' do
+    request.cookies[SESSION_COOKIE_NAME] != ADMIN_SESSION_ID \
+      or redirect '/admin'
+
     haml :admin_login
   end
 
@@ -362,30 +368,31 @@ class Sinatra::Application
       or redirect '/admin/login?try_again=1'
 
     response.set_cookie(SESSION_COOKIE_NAME, {:value => ADMIN_SESSION_ID, :path => '/'})
-    redirect '/admin/winners'
+    redirect '/admin'
   end
 
   get '/admin/winners' do
-    request.cookies[SESSION_COOKIE_NAME] == ADMIN_SESSION_ID \
-      or redirect '/admin/login'
+    display_winners
+  end
 
-    @winners = BusBingo::Player.select {|p| p.can_receive_prize? && p.card.has_bingo? }
-    haml :winners
+  get '/admin' do
+    display_winners
   end
 
   get '/admin/*' do
-    if request.cookies[SESSION_COOKIE_NAME] == ADMIN_SESSION_ID then
-      redirect '/admin/winners'
-    else
-      redirect '/admin/login/'
-    end
+    redirect_lost_admin
   end
 
   #################
   # Everything else
 
+  # 'index' page
+  get '/' do
+    redirect_lost_player
+  end
+
   get '/*' do
-    redirect '/play'
+    redirect_lost_player
   end
 
   # Test that haml works
