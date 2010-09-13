@@ -16,8 +16,8 @@
         %span.email E-mail
 
       #list
-        .row
-          - @winners.each do |p|
+        - @winners.each do |p|
+          .row
             %span.gopass= p.gopass
             %span.email= p.email
 
