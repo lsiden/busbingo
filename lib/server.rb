@@ -20,6 +20,8 @@ class Sinatra::Application
   disable :dump_errors
   enable :logging
 
+STDERR.puts "development" if development?
+
   helpers do
     include BusBingo::Helpers
 
