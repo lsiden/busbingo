@@ -2,6 +2,7 @@ source "https://rubygems.org"
 gem 'pg'
 gem 'do_postgres'
 gem 'dm-core', '~>1.0'
+gem 'dm-sqlite-adapter'
 gem 'dm-timestamps'
 gem 'dm-migrations'
 gem 'dm-is-list'
