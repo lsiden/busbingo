@@ -1,5 +1,6 @@
 source "https://rubygems.org"
 gem 'pg'
+gem 'dm-postgres-adapter'
 gem 'do_postgres'
 gem 'dm-core', '~>1.0'
 gem 'dm-sqlite-adapter'
