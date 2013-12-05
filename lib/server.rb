@@ -97,9 +97,9 @@ class Sinatra::Application
         <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
         <meta http-equiv="content-script-type" content="text/javascript" />
         <title>#{attrs[:title]}</title>
-        <script type="text/javascript" src="/views/jquery-1.4.2.min.js"></script>
+        <script type="text/javascript" src="/views/js/jquery-1.4.2.min.js"></script>
         <script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
-        <script type="text/javascript" src="/views/script.js"></script>
+        <script type="text/javascript" src="/views/js/script.js"></script>
         <link rel="stylesheet" href="/views/style.css" type="text/css" media="all" />
       </head>
       XXX
