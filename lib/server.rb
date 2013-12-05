@@ -190,7 +190,8 @@ class Sinatra::Application
     # URL that rpxnow.com will post to after authenticating user credentials
     domain = localhost? ? LOCAL_DOMAIN : HOSTED_DOMAIN
 
-    @token_url = uri_encode("http://#{domain}/sessions")
+    #@token_url = uri_encode("http://#{domain}/sessions")
+    @token_url = "http://#{domain}/sessions"
     haml :sign_in
   end
 
