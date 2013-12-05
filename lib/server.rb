@@ -25,6 +25,8 @@ class Sinatra::Application
     SESSION_COOKIE_NAME = 'x-busbingo-session-id'
     ADMIN_SESSION_ID = '59f219d4c14b40925f43a3b0a001b4e9eb174c41'
     ADMIN_PASSWORD = 't@keth3Bus!'
+    LOCAL_DOMAIN = 'localhost:5000' 
+    HOSTED_DOMAIN = 'busbingo.heroku.com'
 
     def redirect_lost_player
       if get_session then
@@ -186,7 +188,7 @@ class Sinatra::Application
       if get_session
 
     # URL that rpxnow.com will post to after authenticating user credentials
-    domain = localhost? ? 'localhost:9292' : 'busbingo.getdowntown.org'
+    domain = localhost? ? LOCAL_DOMAIN : HOSTED_DOMAIN
 
     @token_url = uri_encode("http://#{domain}/sessions")
     haml :sign_in
